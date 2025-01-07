@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Accessibility Voice Assistant",
+  "name": "ListenIt",
   "version": "1.0",
   "description": "Розширення для допомоги сліпим людям. Озвучення текстового контенту сторінки.",
   "permissions": ["activeTab", "scripting", "storage"],
@@ -9,8 +9,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html"
-    
+    "default_popup": "index.html"
   },
   "content_scripts": [
     {
@@ -18,7 +17,6 @@
       "js": ["content.js"]
     }
   ],
-  
   "commands": {
     "read-selected-text": {
       "suggested_key": {
