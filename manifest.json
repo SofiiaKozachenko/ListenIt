@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Accessibility Voice Assistant",
+  "version": "1.0",
+  "description": "Розширення для допомоги сліпим людям. Озвучення текстового контенту сторінки.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+    
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  
+  "commands": {
+    "read-selected-text": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R",
+        "mac": "Command+Shift+R"
+      },
+      "description": "Озвучити виділений текст"
+    }
+  }
+}

@@ -1,0 +1,240 @@
+.listen-it2 {
+  &.settingsSection {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(241 246 252);
+    outline-offset: -1px;
+    border-radius: 24px;
+    outline: rgb(0 0 0) solid 1px;
+  }
+
+  .settingsIcon {
+    position: absolute;
+    inset: 62px 66px 1059px 764px;
+    width: 41px;
+    height: 41px;
+  }
+
+  .configContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    row-gap: 0;
+    margin: 56px auto;
+    width: 80.71%;
+  }
+
+  .modeBtn {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    width: 90.47%;
+    background-color: rgb(31 45 93);
+    padding: 34.5px 8px;
+    box-shadow: inset 4px 4px 4px 0 rgb(42 58 110 / 100%);
+  }
+
+  .modeIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .modeTitle {
+    display: flex;
+    justify-content: center;
+    margin: 1px 0 0;
+    width: 220px;
+    height: 39px;
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(255 255 255);
+    text-align: center;
+  }
+
+  .languageWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 10px;
+    margin: 74px 0 0;
+    width: 77.52%;
+  }
+
+  .selectLabel {
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(21 21 22);
+  }
+
+  .languageToggle {
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+    width: 261px;
+  }
+
+  .primaryLang {
+    display: flex;
+    justify-content: center;
+    min-width: 107px;
+    font: 700 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(255 255 255);
+    text-align: center;
+    text-transform: uppercase;
+    background-color: rgb(31 45 93);
+    padding: 18px 20px;
+  }
+
+  .separator {
+    display: flex;
+    justify-content: center;
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(0 0 0);
+    text-align: center;
+  }
+
+  .secondaryLang {
+    display: flex;
+    justify-content: center;
+    min-width: 110px;
+    font: 700 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(37 37 37);
+    text-align: center;
+    text-transform: uppercase;
+    padding: 18px 20px;
+    outline-offset: -2px;
+    outline: rgb(37 37 37) solid 2px;
+  }
+
+  .speedControl {
+    display: flex;
+    flex-direction: column;
+    row-gap: 19px;
+    margin: 74px 0 0;
+  }
+
+  .speedLabel {
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(21 21 22);
+  }
+
+  .sliderContainer {
+    position: relative;
+    min-height: 64px;
+  }
+
+  .sliderIcon {
+    position: absolute;
+    bottom: 35.94%;
+    left: 0%;
+    width: 100%;
+  }
+
+  .sliderTrack {
+    position: absolute;
+    top: 0;
+    left: 155px;
+    width: 64px;
+    height: 100%;
+    background-color: rgb(205 214 243);
+    outline-offset: -6px;
+    border-radius: 32px;
+    outline: rgb(51 67 120) solid 6px;
+  }
+
+  .voiceSelector {
+    display: flex;
+    flex-direction: column;
+    row-gap: 35px;
+    margin: 51px 0 0;
+    width: 74.11%;
+  }
+
+  .voiceLabel {
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(21 21 22);
+  }
+
+  .voiceOptions {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 10px;
+  }
+
+  .femaleOption {
+    display: flex;
+    flex-direction: column;
+    width: 199px;
+    background-color: rgb(31 45 93);
+  }
+
+  .femaleContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 8px;
+    margin: 19px 33px;
+  }
+
+  .femaleIcon {
+    width: 41px;
+  }
+
+  .femaleText {
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(255 255 255);
+  }
+
+  .maleOption {
+    display: flex;
+    flex-direction: column;
+    width: 197px;
+    background-color: rgb(31 45 93);
+  }
+
+  .maleContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 8px;
+    margin: 22px 18px 22px 17px;
+  }
+
+  .maleIcon {
+    width: 62px;
+  }
+
+  .maleText {
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(255 255 255);
+  }
+
+  .adBlockToggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 10px;
+    margin: 74px 0 0;
+    width: 77.95%;
+  }
+
+  .adBlockIcon {
+    width: 67px;
+  }
+
+  .adBlockLabel {
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(21 21 22);
+  }
+
+  .applyBtn {
+    display: flex;
+    justify-content: center;
+    margin: 74px 3px 0 0;
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    color: rgb(255 255 255);
+    text-align: center;
+    background-color: rgb(31 45 93);
+    padding: 34.5px 8px;
+    box-shadow: inset 4px 4px 4px 0 rgb(42 58 110 / 100%);
+  }
+}
