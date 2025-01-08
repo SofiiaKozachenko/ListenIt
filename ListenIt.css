@@ -1,84 +1,94 @@
-
-.listen-it {
+.lkij {
   &.welcomeSection {
     position: relative;
     display: flex;
     flex-direction: column;
     background-color: rgb(241 246 252);
-    outline-offset: -4px;
-    border-radius: 24px;
-    outline: rgb(66 79 123) solid 4px;
-  }
-
-  .appLogo {
-    position: absolute;
-    inset: 62px 66px auto 764px;
-    width: 41px;
+    outline-offset: -3px;
+    border-radius: 22px;
+    outline: rgb(66 79 123) solid 3px;
   }
 
   .contentWrapper {
     position: relative;
     display: flex;
     flex-direction: column;
-    row-gap: 53px;
-    margin: 61px auto;
-    width: 80.71%;
+    row-gap: 49px;
+    margin: 56px auto;
+    width: 80.7%;
   }
 
   .appTitle {
-    font: 400 48px/1.21 Inter, Helvetica, Arial, serif;
+    font: 400 44px/1.2 Inter, Helvetica, Arial, serif;
     color: rgb(21 21 22);
   }
 
-  .welcomeMsg {
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+  .mainDescription {
+    font: 400 30px/1.2 Inter, Helvetica, Arial, serif;
     color: rgb(21 21 22);
   }
 
-  .hoverMode {
+  .hoverInstruction {
     display: flex;
     justify-content: center;
     margin: 0 3px 0 0;
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    font: 400 30px/1.2 Inter, Helvetica, Arial, serif;
     color: rgb(255 255 255);
     text-align: center;
     background-color: rgb(31 45 93);
-    padding: 34.5px 8px;
+    padding: 31.5px 8px;
     box-shadow: inset 4px 4px 4px 0 rgb(79 92 139 / 100%);
   }
 
-  .fullPageMode {
+  .pageContentInstruction {
     display: flex;
     justify-content: center;
     margin: 0 3px 0 0;
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    font: 400 30px/1.2 Inter, Helvetica, Arial, serif;
     color: rgb(255 255 255);
     text-align: center;
     background-color: rgb(31 45 93);
-    padding: 34.5px 8px;
+    padding: 31.5px 8px;
     box-shadow: inset 4px 4px 4px 0 rgb(79 92 139 / 100%);
   }
 
-  .selectedTextMode {
+  .selectedTextInstruction {
     display: flex;
     justify-content: center;
     margin: 0 3px 0 0;
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    font: 400 30px/1.2 Inter, Helvetica, Arial, serif;
     color: rgb(255 255 255);
     text-align: center;
     background-color: rgb(31 45 93);
-    padding: 34.5px 8px;
+    padding: 31.5px 8px;
     box-shadow: inset 4px 4px 4px 0 rgb(79 92 139 / 100%);
   }
 
-  .stopMode {
+  .stopInstruction {
     display: flex;
     justify-content: center;
     margin: 0 3px 0 0;
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    font: 400 30px/1.2 Inter, Helvetica, Arial, serif;
     color: rgb(255 255 255);
     text-align: center;
     background-color: rgb(132 0 2);
-    padding: 34.5px 8px;
+    padding: 31.5px 8px;
+  }
+
+  .assistantIcon {
+    position: absolute;
+    top: 5.47%;
+    right: 6.39%;
+    width: 56px;
+  }
+
+  .colorAccent {
+    position: absolute;
+    top: 136px;
+    right: 53px;
+    width: 12px;
+    height: 225px;
+    background-color: rgb(148 163 209);
+    border-radius: 6px;
   }
 }
