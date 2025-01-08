@@ -4,20 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="index.css">
+  <script src="/script.js" defer></script>
   <title>Voice Assistant</title>
 </head>
 <body>
   <section class="listen-it">
     <div class="contentWrapper">
-      <p class="appTitle">
-        ListenIt
-        <div class="cross"></div>
-      </p>
-      <p class="welcomeMsg">Вітаємо у голосовому помічникові “ListenIt”. Оберіть режим використання.</p>
-      <button class="button-style hoverMode">При наведенні мишки</button>
-      <button class="button-style fullPageMode">Весь вміст сторінки</button>
-      <button class="button-style selectedTextMode">Виділений текст</button>
-      <button class="button-style stopMode">Стоп</button>
+      <p class="appTitle">ListenIt</p>
+      <img id="cross" class="cross" src="/cross.svg" alt="Close icon" />
+      <p class="welcomeMsg" id="welcomeMessage">Вітаємо у голосовому помічникові “ListenIt”. Оберіть режим використання.</p>
+      <p class="instructions" id="instructionsMessage">Для навігації ви можете натиснути на таб, або навести мишкою на екран.</p>
+      <button class="button-style hoverMode" id="hoverModeBtn">При наведенні мишки</button>
+      <button class="button-style fullPageMode" id="fullPageMode">Весь вміст сторінки</button>
+      <button class="button-style selectedTextMode" id="selectedTextMode">Виділений текст</button>
+      <button class="button-style stopMode" id="stopMode">Стоп</button>
     </div>
   </section>
 </body>
