@@ -1,12 +1,15 @@
 .listen-it2 {
   &.settingsSection {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    background-color: rgb(241 246 252);
-    outline-offset: -1px;
-    border-radius: 24px;
-    outline: rgb(0 0 0) solid 1px;
+  overflow: auto;
+  width: 760px;
+  background: #F1F6FC;
+  border: 4px solid #424F7B;
+  border-radius: 24px;
+  max-height: 500px;
+   box-sizing: border-box; 
+   padding-right: 50px;
+
   }
 input[type="range"] {
   appearance: none; /* Скидаємо стандартний стиль */
@@ -120,17 +123,18 @@ input[type="range"]:focus {
   }
 
   .languageWrapper {
-    display: flex;
+    
     justify-content: space-between;
     align-items: center;
-    column-gap: 10px;
+    
     margin: 74px 0 0;
-    width: 77.52%;
+    width: 100%;
   }
 
   .selectLabel {
     font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
     color: rgb(21 21 22);
+   
   }
 
   .languageToggle {
@@ -317,3 +321,27 @@ input[type="range"]:focus {
     box-shadow: inset 4px 4px 4px 0 rgb(42 58 110 / 100%);
   }
 }
+/* Стиль для скролбару */
+.listen-it2.settingsSection::-webkit-scrollbar {
+  width: 12px; /* Ширина вертикального скролбару */
+  height: 12px; /* Висота горизонтального скролбару */
+}
+
+/* Трек скролбару (фон) */
+.listen-it2.settingsSection::-webkit-scrollbar-track {
+  background: #CDD6F3;
+  border-radius: 6px;
+}
+
+/* Повзунок (thumb) */
+.listen-it2.settingsSection::-webkit-scrollbar-thumb {
+  background: #424F7B;
+  border-radius: 6px;
+  border: 1px solid #F1F6FC; /* Простір між повзунком і треком */
+}
+
+/* При наведенні курсора на повзунок */
+.listen-it2.settingsSection::-webkit-scrollbar-thumb:hover {
+  background: #18285C;
+}
+
