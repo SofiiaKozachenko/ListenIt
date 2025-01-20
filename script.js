@@ -6,9 +6,14 @@ document.getElementById('hoverModeBtn').addEventListener('click', function() {
     window.location.href = 'test2.html';
   });
 
-  document.getElementById('selectedTextMode').addEventListener('click', function() {
+  /*document.getElementById('selectedTextMode').addEventListener('click', function() {
     window.location.href = 'test2.html';
+  });*/
+
+  document.getElementById('cross').addEventListener('click', function() {
+    window.close(); // Закриває спливаюче вікно розширення
   });
+  
 
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
@@ -29,6 +34,3 @@ stopButton.addEventListener('click', () => {
   window.speechSynthesis.cancel();
   console.log("Мовлення зупинено.");
 });
-
-
-  

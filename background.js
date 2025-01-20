@@ -1,5 +1,5 @@
 chrome.commands.onCommand.addListener((command) => {
-  if (command === "read-selected-text") {
+  if (command === "selectedTextMode") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, { action: "readSelectedText" });
     });
