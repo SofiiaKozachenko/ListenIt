@@ -9,8 +9,16 @@
 <body>
   <h1>Налаштування</h1>
   <label>
-    <input type="checkbox" id="hoverMode" />
+    <input type="radio" name="mode" id="defaultMode" checked />
+    Озвучення через Tab (дефолтний режим)
+  </label>
+  <label>
+    <input type="radio" name="mode" id="hoverMode" />
     Озвучення при наведенні мишки (і Tab)
+  </label>
+  <label>
+    <input type="radio" name="mode" id="readPageMode" />
+    Читання всього вмісту сторінки
   </label>
   <label>
     <input type="checkbox" id="autoDetectLanguage" />

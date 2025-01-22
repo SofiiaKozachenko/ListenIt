@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const hoverModeCheckbox = document.getElementById("hoverMode");
+  const defaultModeRadio = document.getElementById("defaultMode");
+  const hoverModeRadio = document.getElementById("hoverMode");
+  const readPageModeRadio = document.getElementById("readPageMode");
   const autoDetectLanguageCheckbox = document.getElementById("autoDetectLanguage");
   const ignoreAdsCheckbox = document.getElementById("ignoreAds");
   const voiceSelect = document.getElementById("voiceSelect");
@@ -7,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const speechRateInput = document.getElementById("speechRate");
   const speechPitchInput = document.getElementById("speechPitch");
   const saveSettingsButton = document.getElementById("saveSettings");
+  const stopSpeechButton = document.getElementById("stopSpeech");
 
   function populateVoices() {
     const voices = speechSynthesis.getVoices();
@@ -21,7 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.storage.sync.get("settings", (data) => {
       const settings = data.settings || {};
 
-      hoverModeCheckbox.checked = settings.hoverMode || false;
+      if (settings.mode === 'hoverMode') {
+        hoverModeRadio.checked = true;
+      } else if (settings.mode === 'readPageMode') {
+        readPageModeRadio.checked = true;
+      } else {
+        defaultModeRadio.checked = true;
+      }
+
       autoDetectLanguageCheckbox.checked = settings.autoDetectLanguage || false;
       ignoreAdsCheckbox.checked = settings.ignoreAds || false;
       languageSelect.value = settings.language || "uk-UA";
@@ -40,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function saveSettings() {
     const settings = {
-      hoverMode: hoverModeCheckbox.checked,
+      mode: defaultModeRadio.checked ? 'defaultMode' : hoverModeRadio.checked ? 'hoverMode' : 'readPageMode',
       autoDetectLanguage: autoDetectLanguageCheckbox.checked,
       ignoreAds: ignoreAdsCheckbox.checked,
       selectedVoice: voiceSelect.value || "",
@@ -54,7 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function stopSpeech() {
+    speechSynthesis.cancel(); // Зупиняємо озвучення
+  }
+
   saveSettingsButton.addEventListener("click", saveSettings);
+  stopSpeechButton.addEventListener("click", stopSpeech);
 
   populateVoices();
   speechSynthesis.onvoiceschanged = populateVoices;

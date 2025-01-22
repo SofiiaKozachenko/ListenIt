@@ -3,3 +3,4 @@ chrome.commands.onCommand.addListener((command) => {
     chrome.tabs.sendMessage(tabs[0].id, { action: command });
   });
 });
+
