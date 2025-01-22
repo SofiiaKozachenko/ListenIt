@@ -122,14 +122,13 @@ input[type="range"]:focus {
     text-align: center;
   }
 
-  .languageWrapper {
-    
-    justify-content: space-between;
-    align-items: center;
-    
-    margin: 74px 0 0;
-    width: 100%;
-  }
+ .languageWrapper {
+  display: flex; /* Обов'язково для flexbox */
+  justify-content: space-between;
+  align-items: center;
+  margin: 74px 0 0;
+  width: 100%;
+}
 
   .selectLabel {
     font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
@@ -141,7 +140,7 @@ input[type="range"]:focus {
     display: flex;
     align-items: center;
     column-gap: 16px;
-    width: 261px;
+    width: auto;
   }
 
   .primaryLang {
