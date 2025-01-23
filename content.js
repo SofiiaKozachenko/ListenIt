@@ -110,3 +110,37 @@ const newDiv = document.createElement("div");
 newDiv.innerHTML = `<iframe src="index.html" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
 document.body.appendChild(newDiv);
 
+const hoverModeBtn = document.getElementById('hoverModeBtn');
+
+// Функція для озвучування тексту при наведенні мишки
+function speakOnHover(event) {
+  const target = event.target;
+  const text = target.textContent || target.innerText;
+
+  if (text.trim() !== "") { // Перевірка на наявність тексту
+      console.log("Наведений текст:", text); // Для відлагодження
+      speak(text);
+  }
+}
+
+// Обробник події наведення курсору на елемент
+document.addEventListener('mouseover', (event) => {
+  if (hoverModeBtn.classList.contains('active')) {
+    const element = event.target;
+    const text = element.textContent || element.innerText;
+    speakOnHover(text);
+  }
+});
+
+// Логіка для ввімкнення/вимкнення режиму озвучування при кліку на кнопку
+hoverModeBtn.addEventListener('click', () => {
+  hoverModeBtn.classList.toggle('active');
+});
+
+// Використання бібліотеки Cheerio для парсингу HTML
+const cheerio = require('cheerio');
+
+const $ = cheerio.load(html);
+$('a').text('Посилання');
+const simplifiedHtml = $.html();
+
