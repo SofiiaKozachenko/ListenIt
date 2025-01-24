@@ -10,15 +10,13 @@ chrome.storage.sync.get("settings", (data) => {
     document.addEventListener("mouseover", handleMouseOver);
     document.addEventListener("focusin", handleTabFocus);
   } else if (settings.mode === 'readPageMode') {
-    // Викликаємо озвучення вмісту сторінки при завантаженні
-    window.addEventListener("load", readPageContent);
+    window.addEventListener("load", observeAndReadPageContent);
   } else {
     document.addEventListener("focusin", handleTabFocus);
   }
 
   loadVoices();
 });
-
 
 function loadVoices() {
   voices = speechSynthesis.getVoices();
@@ -29,20 +27,14 @@ function loadVoices() {
   }
 }
 
-let lastSpokenText = ""; // Ініціалізуємо змінну
-
 function handleMouseOver(event) {
   const target = event.target;
   if (target instanceof HTMLElement && isTextContent(target)) {
     const text = target.innerText.trim();
-    if (text && text !== lastSpokenText) {
-      lastSpokenText = text;
-      speak(text);
-    }
+    if (text.length > 1500) return;
+    if (text) speak(text);
   }
 }
-
-
 
 function handleTabFocus(event) {
   const target = event.target;
@@ -54,21 +46,12 @@ function handleTabFocus(event) {
 
 function isTextContent(element) {
   if (settings.ignoreAds && element.closest(".ad")) return false;
-
-  const tagName = element.tagName.toLowerCase();
-  const validTags = [
-    "p", "span", "li", "a", "h1", "h2", "h3", "h4", "h5", "h6",
-    "button", "label", "blockquote", "cite", "q", "strong", "em",
-    "td", "th", "caption", "summary", "figcaption", "code", "pre"
-  ];
-
-  const hasText = element.innerText?.trim() || element.alt || element.title;
-  return validTags.includes(tagName) && hasText;
+  return element.innerText?.trim() || element.alt || element.title;
 }
 
 function speak(text) {
   if (!voicesLoaded) {
-    setTimeout(() => speak(text), 100); // Якщо голоси ще не завантажені, чекаємо
+    setTimeout(() => speak(text), 100);
     return;
   }
 
@@ -84,13 +67,10 @@ function speak(text) {
   currentUtterance.rate = settings.speechRate || 1;
   currentUtterance.pitch = settings.speechPitch || 1;
 
-  currentUtterance.onend = () => {
-    currentUtterance = null;
-  };
+  currentUtterance.onerror = (e) => console.error("Помилка озвучення:", e);
 
   speechSynthesis.speak(currentUtterance);
 }
-
 
 function detectLanguage(text) {
   const ukrainianPattern = /[а-яіїєґ]/i;
@@ -103,22 +83,21 @@ function detectLanguage(text) {
   return "uk-UA";
 }
 
-function readPageContent() {
-  let fullText = document.body.innerText.trim();
+function observeAndReadPageContent() {
+  readPageContent(); // Одразу озвучуємо сторінку при завантаженні
 
-  // Якщо тексту в `body` недостатньо, зчитуємо всі текстові елементи
-  if (!fullText) {
-    const elements = document.querySelectorAll("p, h1, h2, h3, h4, h5, h6, li, span, a");
-    fullText = Array.from(elements)
-      .map(element => element.innerText.trim())
-      .filter(text => text) // Фільтруємо порожні рядки
-      .join(" ");
-  }
+  // Відстежуємо зміни DOM
+  const observer = new MutationObserver(() => {
+    observer.disconnect(); // Зупиняємо, щоб уникнути дублювання
+    readPageContent(); // Озвучуємо сторінку
+  });
 
-  if (fullText) {
-    speak(fullText);
-  } else {
-    console.warn("Не вдалося знайти текст для озвучення.");
-  }
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
+function readPageContent() {
+  const pageText = document.body.innerText.trim();
+  if (pageText) {
+    speak(pageText);
+  }
+}

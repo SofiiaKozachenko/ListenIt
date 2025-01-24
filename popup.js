@@ -1,3 +1,4 @@
+// popup.js
 document.addEventListener("DOMContentLoaded", () => {
   const defaultModeRadio = document.getElementById("defaultMode");
   const hoverModeRadio = document.getElementById("hoverMode");
