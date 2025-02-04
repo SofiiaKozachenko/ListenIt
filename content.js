@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('content.js підключено', window.location.href);
+});
+
 let settings = {};
 let currentUtterance = null; // Для зберігання поточного озвучення
 let voicesLoaded = false; // Статус завантаження голосів
@@ -124,7 +128,7 @@ function speakOnHover(event) {
 }
 
 // Обробник події наведення курсору на елемент
-document.addEventListener('mouseover', (event) => {
+/*document.addEventListener('mouseover', (event) => {
   if (hoverModeBtn.classList.contains('active')) {
     const element = event.target;
     const text = element.textContent || element.innerText;
@@ -135,12 +139,19 @@ document.addEventListener('mouseover', (event) => {
 // Логіка для ввімкнення/вимкнення режиму озвучування при кліку на кнопку
 hoverModeBtn.addEventListener('click', () => {
   hoverModeBtn.classList.toggle('active');
+});*/
+
+document.addEventListener("mouseup", () => {
+  const selection = window.getSelection();
+  if (!selection.rangeCount || selection.isCollapsed) {
+    console.log("Немає виділеного тексту.");
+    return;
+  }
+
+  const selectedText = selection.toString().trim();
+  console.log("Виділений текст:", selectedText);
+
+  if (selectedText.length > 0) {
+    chrome.runtime.sendMessage({ action: "speak", text: selectedText });
+  }
 });
-
-// Використання бібліотеки Cheerio для парсингу HTML
-const cheerio = require('cheerio');
-
-const $ = cheerio.load(html);
-$('a').text('Посилання');
-const simplifiedHtml = $.html();
-

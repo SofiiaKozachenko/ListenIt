@@ -2,15 +2,13 @@
   "manifest_version": 3,
   "name": "ListenIt",
   "version": "1.0",
-  "description": "Розширення для допомоги сліпим людям. Озвучення текстового контенту сторінки.",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "tabs", "scripting", "storage", "contextMenus"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "index.html"
-    
   },
   "content_scripts": [
     {

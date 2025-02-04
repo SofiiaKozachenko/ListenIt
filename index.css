@@ -82,3 +82,9 @@ body {
   padding-top: 30px;
   border: 1px solid black;
 }
+
+.active-mode {
+  background-color: #007bff; /* Синій колір при активації */
+  color: white;
+  font-weight: bold;
+}
