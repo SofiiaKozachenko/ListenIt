@@ -106,7 +106,6 @@ input[type="range"]:focus {
 }
 
   .modeIcon {
-    
     width: 40px;
     height: 40px;
   }
@@ -122,66 +121,14 @@ input[type="range"]:focus {
     text-align: center;
   }
 
-  .languageWrapper {
-    
-    justify-content: space-between;
-    align-items: center;
-    
-    margin: 74px 0 0;
-    width: 100%;
-  }
-
-  .selectLabel {
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
-    color: rgb(21 21 22);
-   
-  }
-
-  .languageToggle {
-    display: flex;
-    align-items: center;
-    column-gap: 16px;
-    width: 261px;
-  }
-
-  .primaryLang {
-    display: flex;
-    justify-content: center;
-    min-width: 107px;
-    font: 700 32px/1.22 Inter, Helvetica, Arial, serif;
-    color: rgb(255 255 255);
-    text-align: center;
-    text-transform: uppercase;
-    background-color: rgb(31 45 93);
-    padding: 18px 20px;
-  }
-
-  .separator {
-    display: flex;
-    justify-content: center;
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
-    color: rgb(0 0 0);
-    text-align: center;
-  }
-
-  .secondaryLang {
-    display: flex;
-    justify-content: center;
-    min-width: 110px;
-    font: 700 32px/1.22 Inter, Helvetica, Arial, serif;
-    color: rgb(37 37 37);
-    text-align: center;
-    text-transform: uppercase;
-    padding: 18px 20px;
-    outline-offset: -2px;
-    outline: rgb(37 37 37) solid 2px;
-  }
-
-  .speedControl {
+  .speedControl, .toneControl {
     display: flex;
     flex-direction: column;
-    row-gap: 19px;
-    margin: 74px 0 0;
+    margin-top: 30px;
+  }
+
+  .toneControl{
+    margin-top: 20px;
   }
 
   .speedLabel {
@@ -196,7 +143,6 @@ input[type="range"]:focus {
 
   .sliderIcon {
     position: absolute;
-    bottom: 35.94%;
     left: 0%;
     width: 100%;
   }
@@ -211,83 +157,6 @@ input[type="range"]:focus {
     outline-offset: -6px;
     border-radius: 32px;
     outline: rgb(51 67 120) solid 6px;
-  }
-
-  .voiceSelector {
-    display: flex;
-    flex-direction: column;
-    row-gap: 35px;
-    margin: 51px 0 0;
-    width: 74.11%;
-  }
-
-  .voiceLabel {
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
-    color: rgb(21 21 22);
-  }
-
-  .voiceOptions {
-    display: flex;
-    
-    column-gap: 200px;
-  }
-
-  .femaleOption {
-    
-    flex-direction: column;
-    width: 199px;
-    height: 136px;
-    background-color: rgb(31 45 93);
-  }
-
-  .femaleContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-    margin: 19px 33px;
-    
-  }
-
-  .femaleIcon {
-    width: 41px;
-  }
-
-  .femaleText {
-    font: 32px Inter, Helvetica, Arial, serif;
-    color: rgb(255 255 255);
-    line-height: 1;
-    margin-top: 0px;
-    margin-bottom: 0px;
-  }
-
-  .maleOption {
-   
-    flex-direction: column;
-    width: 199px;
-    height: 136px;
-    background-color: rgb(31 45 93);
-  }
-
-  .maleContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    
-    margin: 19px 33px;
-    
-  }
-
-  .maleIcon {
-    width: 62px;
-  }
-
-  .maleText {
-    font: 32px Inter, Helvetica, Arial, serif;
-    color: rgb(255 255 255);
-    line-height: 1;
-    margin-top: 0px;
-    margin-bottom: 0px;
   }
 
   .adBlockToggle {
@@ -309,16 +178,14 @@ input[type="range"]:focus {
   }
 
   .applyBtn {
-    display: flex;
-    width:100%;
-    justify-content: center;
-    margin: 74px 3px 0 0;
-    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
-    color: rgb(255 255 255);
-    text-align: center;
-    background-color: rgb(31 45 93);
-    padding: 34.5px 8px;
-    box-shadow: inset 4px 4px 4px 0 rgb(42 58 110 / 100%);
+    background-color: rgb(31, 45, 93);
+    width: 641px;
+    height: 99px;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 30px;
   }
 }
 /* Стиль для скролбару */
@@ -345,3 +212,62 @@ input[type="range"]:focus {
   background: #18285C;
 }
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 641px;
+}
+
+.dropdown-btn {
+  font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+  background-color: #1F2D5D;
+  height: 90px;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+}
+
+.dropdown-btn::after {
+  content: " ▼";
+  position: absolute;
+  right: 10px;
+}
+
+.dropdown-content {
+  font: 400 30px/1.22 Inter, Helvetica, Arial, serif;
+  display: none;
+  position: absolute;
+  background-color: #CCD4EF;
+  width: 100%;
+  overflow: hidden;
+  z-index: 1;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-item:nth-child(even) {
+  background-color: #B6BFDA;
+}
+
+.dropdown-item:nth-child(odd) {
+  background-color: #CCD4EF;
+}
+
+.dropdown-content div {
+  text-align: center;
+  height: 90px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.dropdown-content div:hover {
+  background-color: #f1f1f1;
+}
+
+.show {
+  display: block;
+}

@@ -12,6 +12,7 @@
     
 
     <link rel="stylesheet" type="text/css" href="ListenIt2.css" />
+    <script src="test2.js" defer></script>
 
   </head>
 
@@ -25,41 +26,22 @@
           <img class="modeIcon" src="proicons_arrow-up.svg" alt="alt text" />
           <p class="modeTitle">Вибір режиму</p>
         </a>
-        <div class="languageWrapper">
-          <p class="selectLabel">Оберіть мову :</p>
-          <div class="languageToggle">
-            <button class="primaryLang"> 
-              укр
-            </button>
-            <span class="separator">/</span>
-            <button class="secondaryLang">
-              eng
-            </button>
-          </div>
-        </div>
         <div class="speedControl">
-          <p class="speedLabel">Оберіть швидкість :</p>
+          <p class="speedLabel">Оберіть швидкість:</p>
           <div class="sliderContainer">
             <input type="range" min="1" max="100" value="50">
           </div>
         </div>
-        <div class="voiceSelector">
-          <p class="voiceLabel">Оберіть голос :</p>
-          <div class="voiceOptions">
-            <button class="femaleOption">
-              <div class="femaleContent">
-                <img class="femaleIcon" src="female.svg" alt="alt text" />
-                <p class="femaleText">Жіночий</p>
-              </div>
-            </button>
-            <button class="maleOption">
-              <div class="maleContent">
-                <img class="maleIcon" src="male.svg" alt="alt text" />
-                <p class="maleText">Чоловічий</p>
-              </div>
-            </button>
+        <div class="toneControl">
+          <p class="speedLabel">Оберіть тембр:</p>
+          <div class="sliderContainer">
+            <input type="range" min="1" max="100" value="50">
           </div>
         </div>
+        <div class="dropdown">
+          <p class="speedLabel">Оберіть голос:</p>
+          <button class="dropdown-btn" id="voice-btn"></button>
+          <div class="dropdown-content" id="voice-list"></div>
         <div class="adBlockToggle">
           <input type="checkbox" id="myCheckbox" class="hidden">
 <label for="myCheckbox">
@@ -72,7 +54,6 @@
         </button>
       </div>
     </section>
-
 
   </body>
 
