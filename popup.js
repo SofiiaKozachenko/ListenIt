@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultModeRadio = document.getElementById("defaultMode");
   const hoverModeRadio = document.getElementById("hoverMode");
   const readPageModeRadio = document.getElementById("readPageMode");
+  const selectionModeRadio = document.getElementById("selectionMode");
   const autoDetectLanguageCheckbox = document.getElementById("autoDetectLanguage");
   const ignoreAdsCheckbox = document.getElementById("ignoreAds");
   const voiceSelect = document.getElementById("voiceSelect");
@@ -29,6 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
         hoverModeRadio.checked = true;
       } else if (settings.mode === 'readPageMode') {
         readPageModeRadio.checked = true;
+      } else if (settings.mode === 'selectionMode') {
+        selectionModeRadio.checked = true;
       } else {
         defaultModeRadio.checked = true;
       }
@@ -50,20 +53,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function saveSettings() {
-    const settings = {
-      mode: defaultModeRadio.checked ? 'defaultMode' : hoverModeRadio.checked ? 'hoverMode' : 'readPageMode',
-      autoDetectLanguage: autoDetectLanguageCheckbox.checked,
-      ignoreAds: ignoreAdsCheckbox.checked,
-      selectedVoice: voiceSelect.value || "",
-      language: languageSelect.value,
-      speechRate: parseFloat(speechRateInput.value),
-      speechPitch: parseFloat(speechPitchInput.value),
-    };
+  const settings = {
+    mode: selectionModeRadio.checked ? 'selectionMode' :
+          defaultModeRadio.checked ? 'defaultMode' :
+          hoverModeRadio.checked ? 'hoverMode' : 
+          readPageModeRadio.checked ? 'readPageMode' : 'defaultMode',
+    autoDetectLanguage: autoDetectLanguageCheckbox.checked,
+    ignoreAds: ignoreAdsCheckbox.checked,
+    selectedVoice: voiceSelect.value || "",
+    language: languageSelect.value,
+    speechRate: parseFloat(speechRateInput.value),
+    speechPitch: parseFloat(speechPitchInput.value),
+  };
 
-    chrome.storage.sync.set({ settings }, () => {
-      alert("Налаштування збережено!");
-    });
-  }
+  chrome.storage.sync.set({ settings }, () => {
+    alert("Налаштування збережено!");
+  });
+}
+
 
   function stopSpeech() {
     speechSynthesis.cancel(); // Зупиняємо озвучення

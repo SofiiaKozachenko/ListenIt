@@ -11,12 +11,21 @@ chrome.storage.sync.get("settings", (data) => {
     document.addEventListener("focusin", handleTabFocus);
   } else if (settings.mode === 'readPageMode') {
     window.addEventListener("load", observeAndReadPageContent);
+  } else if (settings.mode === 'selectionMode') {
+    document.addEventListener("mouseup", handleTextSelection);
   } else {
     document.addEventListener("focusin", handleTabFocus);
   }
 
   loadVoices();
 });
+
+
+
+function isTextContent(element) {
+  if (settings.ignoreAds && element.closest(".ad")) return false;
+  return element.innerText?.trim() || element.alt || element.title;
+}
 
 function loadVoices() {
   voices = speechSynthesis.getVoices();
@@ -44,10 +53,14 @@ function handleTabFocus(event) {
   }
 }
 
-function isTextContent(element) {
-  if (settings.ignoreAds && element.closest(".ad")) return false;
-  return element.innerText?.trim() || element.alt || element.title;
+function handleTextSelection() {
+  const selectedText = window.getSelection().toString().trim();
+  if (selectedText ) {
+    speak(selectedText);
+  }
 }
+
+
 
 function speak(text) {
   if (!voicesLoaded) {
@@ -101,3 +114,5 @@ function readPageContent() {
     speak(pageText);
   }
 }
+
+
