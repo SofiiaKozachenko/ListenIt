@@ -1,69 +1,80 @@
-document.getElementById('hoverModeBtn').addEventListener('click', function() {
-    window.location.href = 'test2.html';
-  });
-
-  document.getElementById('fullPageMode').addEventListener('click', function() {
-    window.location.href = 'test2.html';
-  });
-
-  /*document.getElementById('selectedTextMode').addEventListener('click', function() {
-    window.location.href = 'test2.html';
-  });*/
-
-  document.getElementById('cross').addEventListener('click', function() {
-    window.close(); // Закриває спливаюче вікно розширення
-  });
-  
-
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'uk-UA'; 
   speechSynthesis.speak(utterance);
 }
 
-window.addEventListener('load', () => {
-  const welcomeMessage = document.getElementById('welcomeMessage');
-  const instructionsMessage = document.getElementById('instructionsMessage');
-  speak(welcomeMessage.innerText);
-  speak(instructionsMessage.innerText);
-});
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultModeRadio = document.getElementById("defaultMode");
+  const hoverModeRadio = document.getElementById("hoverModeBtn");
+  const readPageModeRadio = document.getElementById("fullPageMode");
+  const selectionModeRadio = document.getElementById("selectionTextMode");
+  const autoDetectLanguageCheckbox = document.getElementById("autoDetectLanguage");
+  const ignoreAdsCheckbox = document.getElementById("ignoreAds");
+  const voiceSelect = document.getElementById("voice-btn");
+  const speechRateInput = document.getElementById("speechRate");
+  const speechPitchInput = document.getElementById("toneRate");
+  const saveSettingsButton = document.getElementById("applyButton");
+  const stopSpeechButton = document.getElementById("stopMode");
 
-const stopButton = document.getElementById('stopMode');
-
-stopButton.addEventListener('click', () => {
-  window.speechSynthesis.cancel();
-  console.log("Мовлення зупинено.");
-});
-
-let selectionModeEnabled = false;
-
-// Активація режиму читання при натисканні на кнопку
-document.getElementById('selectedTextMode').addEventListener('click', function() {
-  selectionModeEnabled = true;
-  console.log("Режим читання виділеного тексту активовано");
-});
-
-document.addEventListener("mouseup", () => {
-  const selection = window.getSelection();
-
-  // Логування об'єкта Selection для діагностики
-  console.log("Повний об'єкт Selection:", selection);
-
-  if (!selection.rangeCount || selection.isCollapsed) {
-    console.log("Немає виділеного тексту або лише курсор.");
-    return;
+  function populateVoices() {
+      const voices = speechSynthesis.getVoices();
+      if (voices.length > 0) {
+          voiceSelect.innerHTML = voices
+              .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
+              .join("");
+      }
   }
 
-  const selectedText = selection.toString().trim();
+  function loadSettings() {
+      chrome.storage.sync.get("settings", (data) => {
+          const settings = data.settings || {};
 
-  if (selectedText.length > 0) {
-    speak(selectedText);
-  } else {
-    console.log("Виділений текст порожній.");
+          if (settings.mode === 'hoverMode') {
+              hoverModeRadio.checked = true;
+          } else if (settings.mode === 'readPageMode') {
+              readPageModeRadio.checked = true;
+          } else if (settings.mode === 'selectionMode') {
+              selectionModeRadio.checked = true;
+          } else {
+              defaultModeRadio.checked = true;
+          }
+
+          autoDetectLanguageCheckbox.checked = settings.autoDetectLanguage || false;
+          ignoreAdsCheckbox.checked = settings.ignoreAds || false;
+          languageSelect.value = settings.language || "uk-UA";
+          speechRateInput.value = settings.speechRate || 1;
+          speechPitchInput.value = settings.speechPitch || 1;
+
+          const voices = speechSynthesis.getVoices();
+          if (voices.length > 0 && settings.selectedVoice) {
+              const selectedVoice = voices.find(voice => voice.name === settings.selectedVoice);
+              if (selectedVoice) {
+                  voiceSelect.value = selectedVoice.name;
+              }
+          }
+      });
   }
+
+  function saveSettings() {
+      const settings = {
+          mode: selectionModeRadio.checked ? 'selectionTextMode' :
+              defaultModeRadio.checked ? 'defaultMode' :
+              hoverModeRadio.checked ? 'hoverMode' : 
+              readPageModeRadio.checked ? 'fullPageMode' : 'defaultMode',
+          autoDetectLanguage: autoDetectLanguageCheckbox.checked,
+          ignoreAds: ignoreAdsCheckbox.checked,
+          selectedVoice: voiceSelect.value || "",
+          speechRate: parseFloat(speechRateInput.value),
+          speechPitch: parseFloat(speechPitchInput.value),
+      };
+
+      chrome.storage.sync.set({ settings }, () => {
+          alert("Налаштування збережено!");
+      });
+  }
+
+  loadSettings();
+
+  saveSettingsButton.addEventListener("click", saveSettings);
 });
-
-
-
-
-

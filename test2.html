@@ -12,7 +12,7 @@
   <body class="flex-column">
 
     <section class="listen-it2 settingsSection">
-      <img class="settingsIcon" src="cross.svg" alt="alt text" />
+      <img class="cross" src="cross.svg" alt="alt text" />
       <div class="configContainer">
         <a href="index.html" class="modeBtn">
           <img class="modeIcon" src="proicons_arrow-up.svg" alt="alt text" />
@@ -27,7 +27,7 @@
         <div class="toneControl">
           <p class="speedLabel">Оберіть тембр:</p>
           <div class="sliderContainer">
-            <input type="range" min="1" max="100" value="50">
+            <input type="range" id="toneRate" min="1" max="100" value="50">
           </div>
         </div>
         <div class="dropdown">
@@ -36,7 +36,7 @@
           <div class="dropdown-content" id="voice-list"></div>
         </div>
         <div class="adBlockToggle">
-          <input type="checkbox" id="myCheckbox" class="hidden">
+          <input type="checkbox" id="ignoreAds" class="hidden">
           <label for="myCheckbox">
             <span class="checkmark"></span>
           </label>

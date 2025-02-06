@@ -43,66 +43,54 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+function speak(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'uk-UA'; 
+  speechSynthesis.speak(utterance);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-    const voiceSelect = document.getElementById("voice-btn");
-    const speechRateInput = document.getElementById("speechRate"); // Ползунок для швидкості
-    const saveSettingsButton = document.getElementById("applyButton");
+  const voiceSelect = document.getElementById("voice-btn");
+  const speechRateInput = document.getElementById("speechRate");
+  const speechPitchInput = document.getElementById("toneRate");
+  const saveSettingsButton = document.getElementById("applyButton");
 
-    // Завантаження збережених налаштувань
-    function loadSettings() {
-      chrome.storage.sync.get("settings", (data) => {
-        const settings = data.settings || {};
-
-        // Встановлення значень у UI
-        speechRateInput.value = settings.speechRate || 50; // Встановлюємо значення швидкості
-
-        // Встановлення обраного голосу
-        const voices = speechSynthesis.getVoices();
-        if (settings.selectedVoice) {
-          const selectedVoice = voices.find(voice => voice.name === settings.selectedVoice);
-          if (selectedVoice) {
-            voiceSelect.value = selectedVoice.name;
-          }
-        }
-      });
+  // Функція для заповнення списку голосів
+  function populateVoices() {
+    const voices = speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      voiceSelect.innerHTML = voices
+        .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
+        .join("");
     }
+  }
 
-    // Озвучення тестового тексту при зміні голосу або швидкості
-    function testVoice() {
-      const selectedVoiceName = voiceSelect.value;
-      const testText = "Це тестовий текст для перевірки голосу.";
-      const utterance = new SpeechSynthesisUtterance(testText);
-
-      const voices = speechSynthesis.getVoices();
-      const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-      utterance.rate = parseFloat(speechRateInput.value) / 50 || 1; // Оновлюємо швидкість на основі значення ползунка
-
-      speechSynthesis.speak(utterance);
+  // Завантаження налаштувань
+  chrome.storage.sync.get("settings", (data) => {
+    const settings = data.settings || {};
+    if (settings.selectedVoice) {
+      voiceSelect.value = settings.selectedVoice;
     }
+    speechRateInput.value = settings.speechRate || 1;
+    speechPitchInput.value = settings.speechPitch || 1;
+  });
 
-    // Збереження налаштувань
-    saveSettingsButton.addEventListener("click", () => {
-      const settings = {
-        selectedVoice: voiceSelect.value,
-        speechRate: parseFloat(speechRateInput.value), // Отримуємо значення швидкості
-      };
+  // Збереження налаштувань
+  function saveSettings() {
+    const settings = {
+      selectedVoice: voiceSelect.value || "",
+      speechRate: parseFloat(speechRateInput.value),
+      speechPitch: parseFloat(speechPitchInput.value),
+    };
 
-      chrome.storage.sync.set({ settings }, () => {
-        alert("Налаштування збережено!");
-      });
+    chrome.storage.sync.set({ settings }, () => {
+      alert("Налаштування збережено!");
     });
+  }
 
-    // Прив'язка події зміни голосу або швидкості
-    voiceSelect.addEventListener("change", testVoice);
-    speechRateInput.addEventListener("input", testVoice); // Додано обробник для зміни значення ползунка
-
-    // Завантаження голосів при ініціалізації
-    populateVoices();
-    speechSynthesis.onvoiceschanged = populateVoices;
-
-    // Завантаження налаштувань при відкритті popup
-    loadSettings();
+  // Додавання слухача для збереження
+  saveSettingsButton.addEventListener("click", saveSettings);
+  populateVoices();
+  speechSynthesis.onvoiceschanged = populateVoices;
+  saveSettings();
 });

@@ -49,7 +49,7 @@ input[type="range"]::-webkit-slider-thumb {
     border-radius: 8px;
 }
 
-#myCheckbox:checked + label .checkmark::after {
+#ignoreAds:checked + label .checkmark::after {
   content: ""; 
   position: absolute;
   display: block; /* Додали display: block */
@@ -61,19 +61,19 @@ input[type="range"]::-webkit-slider-thumb {
   
 }
 
-.myCheckbox:checked + label .checkmark::after {
+.ignoreAds:checked + label .checkmark::after {
     display: block;
 }
 input[type="range"]:focus {
   opacity: 1;
 }
-  .settingsIcon {
-    position: absolute;
-    top: 49px;
-    right: 49px;
-    width: 41px;
-    height: 41px;
-    cursor: pointer;
+.cross {
+  position: absolute;
+  width: 37px;
+  height: 37px;
+  top: 50px;
+  right: 70px;
+  cursor: pointer;
 }
 
 .settingsIcon:hover {
