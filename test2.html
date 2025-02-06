@@ -1,25 +1,17 @@
 <!DOCTYPE html>
-
 <html>
 
   <head>
-
     <meta charset="utf-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
     <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
-    
-
     <link rel="stylesheet" type="text/css" href="ListenIt2.css" />
     <script src="test2.js" defer></script>
-
   </head>
 
   <body class="flex-column">
 
     <section class="listen-it2 settingsSection">
-      
       <img class="settingsIcon" src="cross.svg" alt="alt text" />
       <div class="configContainer">
         <a href="index.html" class="modeBtn">
@@ -29,9 +21,9 @@
         <div class="speedControl">
           <p class="speedLabel">Оберіть швидкість:</p>
           <div class="sliderContainer">
-            <input type="range" min="1" max="100" value="50">
+            <input type="range" id="speechRate" min="1" max="100" value="50">
           </div>
-        </div>
+        </div>        
         <div class="toneControl">
           <p class="speedLabel">Оберіть тембр:</p>
           <div class="sliderContainer">
@@ -42,19 +34,19 @@
           <p class="speedLabel">Оберіть голос:</p>
           <button class="dropdown-btn" id="voice-btn"></button>
           <div class="dropdown-content" id="voice-list"></div>
+        </div>
         <div class="adBlockToggle">
           <input type="checkbox" id="myCheckbox" class="hidden">
-<label for="myCheckbox">
-  <span class="checkmark"></span>
-</label>
+          <label for="myCheckbox">
+            <span class="checkmark"></span>
+          </label>
           <p class="adBlockLabel">Режим ігнорування реклами</p>
         </div>
-        <button class="applyBtn"> 
-          Застосувати зміни
-        </button>
+        <button id="applyButton">Застосувати зміни</button>
       </div>
     </section>
 
   </body>
 
 </html>
+

@@ -177,7 +177,7 @@ input[type="range"]:focus {
     color: rgb(21 21 22);
   }
 
-  .applyBtn {
+  #applyButton {
     background-color: rgb(31, 45, 93);
     width: 641px;
     height: 99px;
