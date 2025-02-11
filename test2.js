@@ -43,6 +43,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+document.getElementById('cross').addEventListener('click', function() {
+  window.close();
+});
+
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'uk-UA'; 
@@ -55,30 +59,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const speechPitchInput = document.getElementById("toneRate");
   const saveSettingsButton = document.getElementById("applyButton");
 
-  // Завантаження налаштувань
   chrome.storage.sync.get("settings", (data) => {
     const settings = data.settings || {};
     if (settings.selectedVoice) {
-      voiceSelect.value = settings.selectedVoice;
+        voiceSelect.value = settings.selectedVoice;
     }
     speechRateInput.value = settings.speechRate || 1;
     speechPitchInput.value = settings.speechPitch || 1;
   });
 
-  // Збереження налаштувань
+// Збереження налаштувань
   function saveSettings() {
     const settings = {
-      selectedVoice: voiceSelect.value || "",
-      speechRate: parseFloat(speechRateInput.value),
-      speechPitch: parseFloat(speechPitchInput.value),
+        selectedVoice: voiceSelect.value || "",
+        speechRate: parseFloat(speechRateInput.value),
+        speechPitch: parseFloat(speechPitchInput.value),
     };
 
     chrome.storage.sync.set({ settings }, () => {
-      alert("Налаштування збережено!");
+        alert("Налаштування збережено!");
     });
   }
 
-  // Додавання слухача для збереження
-  saveSettingsButton.addEventListener("click", saveSettings);
-  saveSettings();
+  if (saveSettingsButton) {
+    saveSettingsButton.addEventListener("click", (event) => {
+        saveSettings();
+    });
+  }
 });
