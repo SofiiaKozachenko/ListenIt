@@ -11,7 +11,7 @@ chrome.storage.sync.get("settings", (data) => {
     document.addEventListener("focusin", handleTabFocus);
   } else if (settings.mode === 'fullPageMode') {
     window.addEventListener("load", observeAndReadPageContent);
-  } else if (settings.mode === 'selectionTextMode') {
+  } else if (settings.mode === 'selectedTextMode') {
     document.addEventListener("mouseup", handleTextSelection);
   } else {
     document.addEventListener("focusin", handleTabFocus);

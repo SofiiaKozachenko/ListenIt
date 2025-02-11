@@ -1,10 +1,10 @@
-document.getElementById('hoverModeBtn').addEventListener('click', function() {
+/*document.getElementById('hoverModeBtn').addEventListener('click', function() {
     window.location.href = 'test2.html';
-});
+});*/
   
-document.getElementById('fullPageMode').addEventListener('click', function() {
+/*document.getElementById('fullPageMode').addEventListener('click', function() {
     window.location.href = 'test2.html';
-});
+});*/
   
 /*document.getElementById('selectedTextMode').addEventListener('click', function() {
     window.location.href = 'test2.html';
@@ -34,39 +34,57 @@ function speak(text) {
     speechSynthesis.speak(utterance);
   }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const hoverModeRadio = document.getElementById("hoverModeBtn");
-    const readPageModeRadio = document.getElementById("fullPageMode");
-    const selectionModeRadio = document.getElementById("selectedTextMode");
-  
-    // Завантаження збережених налаштувань
+  document.addEventListener("DOMContentLoaded", () => {
+    const hoverModeBtn = document.getElementById("hoverModeBtn");
+    const fullPageModeBtn = document.getElementById("fullPageMode");
+    const selectedTextModeBtn = document.getElementById("selectedTextMode");
+
+    // Завантаження збереженого режиму
     chrome.storage.sync.get("settings", (data) => {
-      const settings = data.settings || {};
-      if (settings.mode === 'hoverMode') {
-        hoverModeRadio.checked = true;
-      } else if (settings.mode === 'readPageMode') {
-        readPageModeRadio.checked = true;
-      } else if (settings.mode === 'selectionMode') {
-        selectionModeRadio.checked = true;
-      }
+        console.log("Отримані налаштування:", data);
+        const settings = data.settings || { mode: "defaultMode" };
+
+        // Виділяємо активну кнопку
+        highlightActiveMode(settings.mode);
     });
-  
-    // Збереження вибраного режиму
-    function saveModeSettings() {
-      const settings = {
-        mode: hoverModeRadio.checked ? 'hoverMode' :
-          readPageModeRadio.checked ? 'readPageMode' :
-          selectionModeRadio.checked ? 'selectionMode' : 'defaultMode',
-      };
-  
-      chrome.storage.sync.set({ settings }, () => {
-        alert("Режим збережено!");
-      });
+
+    // Функція для збереження вибраного режиму
+    function saveModeSettings(selectedMode) {
+        chrome.storage.sync.set({ settings: { mode: selectedMode } }, () => {
+            console.log("Режим збережено:", { mode: selectedMode });
+            highlightActiveMode(selectedMode);
+            alert(`Режим змінено на: ${getModeName(selectedMode)}`); // Відображення повідомлення
+        });
     }
-  
-    // Додавання слухача для збереження
-    hoverModeRadio.addEventListener("click", saveModeSettings);
-    readPageModeRadio.addEventListener("click", saveModeSettings);
-    selectionModeRadio.addEventListener("click", saveModeSettings);
-  });
+
+    // Функція для підсвічування активного режиму
+    function highlightActiveMode(activeMode) {
+        document.querySelectorAll(".button-style").forEach(btn => {
+            btn.classList.remove("active-mode"); // Видаляємо підсвічування з усіх кнопок
+        });
+
+        const activeButton = document.getElementById(activeMode);
+        if (activeButton) {
+            activeButton.classList.add("active-mode"); // Додаємо підсвічування
+        }
+    }
+
+    // Функція для красивого відображення назв режимів в alert
+    function getModeName(modeId) {
+        switch (modeId) {
+            case "hoverModeBtn": return "При наведенні мишки";
+            case "fullPageMode": return "Весь вміст сторінки";
+            case "selectedTextMode": return "Виділений текст";
+            default: return "Невідомий режим";
+        }
+    }
+
+    // Додаємо обробники подій для кнопок
+    hoverModeBtn.addEventListener("click", () => saveModeSettings("hoverModeBtn"));
+    fullPageModeBtn.addEventListener("click", () => saveModeSettings("fullPageMode"));
+    selectedTextModeBtn.addEventListener("click", () => saveModeSettings("selectedTextMode"));
+});
+
+
+
   
