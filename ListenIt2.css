@@ -229,6 +229,7 @@ input[type="range"]:focus {
   cursor: pointer;
   text-align: left;
   position: relative;
+  text-overflow: ellipsis;
 }
 
 .dropdown-btn::after {
@@ -262,12 +263,13 @@ input[type="range"]:focus {
   height: 90px;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
+  text-overflow: ellipsis;
 }
 
 .dropdown-content div:hover {
   background-color: #f1f1f1;
 }
 
-.show {
+.dropdown-content.show {
   display: block;
 }

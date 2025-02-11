@@ -1,46 +1,46 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const voiceBtn = document.getElementById("voice-btn");
-    const voiceList = document.getElementById("voice-list");
+  const voiceBtn = document.getElementById("voice-btn");
+  const voiceList = document.getElementById("voice-list");
 
-    function populateVoices() {
-        const voices = speechSynthesis.getVoices();
+  function populateVoices() {
+      const voices = speechSynthesis.getVoices();
 
-        voiceList.innerHTML = "";
-        voices.forEach((voice, index) => {
-            const voiceOption = document.createElement("div");
-            voiceOption.textContent = `${voice.name} (${voice.lang})`;
-            voiceOption.dataset.value = voice.name;
-            voiceOption.classList.add("dropdown-item");
+      voiceList.innerHTML = "";
+      voices.forEach((voice, index) => {
+          const voiceOption = document.createElement("div");
+          voiceOption.textContent = `${voice.name} (${voice.lang})`;
+          voiceOption.dataset.value = voice.name;
+          voiceOption.classList.add("dropdown-item");
 
-            voiceOption.addEventListener("click", function () {
-                voiceBtn.textContent = this.textContent;
-                voiceList.classList.remove("show");
-            });
+          voiceOption.addEventListener("click", function () {
+              voiceBtn.textContent = this.textContent;
+              voiceList.classList.remove("show");
+          });
 
-            voiceList.appendChild(voiceOption);
+          voiceList.appendChild(voiceOption);
 
-            // Встановлюємо перший голос як значення кнопки
-            if (index === 0) {
-                voiceBtn.textContent = `${voice.name} (${voice.lang})`;
-            }
-        });
-    }
+          // Встановлюємо перший голос як значення кнопки
+          if (index === 0) {
+              voiceBtn.textContent = `${voice.name} (${voice.lang})`;
+          }
+      });
+  }
 
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = populateVoices;
-    } else {
-        populateVoices();
-    }
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoices;
+  } else {
+      populateVoices();
+  }
 
-    voiceBtn.addEventListener("click", function () {
-        voiceList.classList.toggle("show");
-    });
+  voiceBtn.addEventListener("click", function () {
+      voiceList.classList.toggle("show");
+  });
 
-    document.addEventListener("click", function (e) {
-        if (!voiceBtn.contains(e.target) && !voiceList.contains(e.target)) {
-            voiceList.classList.remove("show");
-        }
-    });
+  document.addEventListener("click", function (e) {
+      if (!voiceBtn.contains(e.target) && !voiceList.contains(e.target)) {
+          voiceList.classList.remove("show");
+      }
+  });
 });
 
 function speak(text) {
@@ -54,16 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const speechRateInput = document.getElementById("speechRate");
   const speechPitchInput = document.getElementById("toneRate");
   const saveSettingsButton = document.getElementById("applyButton");
-
-  // Функція для заповнення списку голосів
-  function populateVoices() {
-    const voices = speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      voiceSelect.innerHTML = voices
-        .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
-        .join("");
-    }
-  }
 
   // Завантаження налаштувань
   chrome.storage.sync.get("settings", (data) => {
@@ -90,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Додавання слухача для збереження
   saveSettingsButton.addEventListener("click", saveSettings);
-  populateVoices();
   speechSynthesis.onvoiceschanged = populateVoices;
   saveSettings();
 });
