@@ -80,6 +80,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Додавання слухача для збереження
   saveSettingsButton.addEventListener("click", saveSettings);
-  speechSynthesis.onvoiceschanged = populateVoices;
   saveSettings();
 });

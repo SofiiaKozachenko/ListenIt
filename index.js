@@ -50,15 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
         selectionModeRadio.checked = true;
       }
     });
-
-    function populateVoices() {
-        const voices = speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          voiceSelect.innerHTML = voices
-            .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
-            .join("");
-        }
-      }
   
     // Збереження вибраного режиму
     function saveModeSettings() {
@@ -77,8 +68,5 @@ document.addEventListener("DOMContentLoaded", () => {
     hoverModeRadio.addEventListener("click", saveModeSettings);
     readPageModeRadio.addEventListener("click", saveModeSettings);
     selectionModeRadio.addEventListener("click", saveModeSettings);
-
-    populateVoices();
-    speechSynthesis.onvoiceschanged = populateVoices;
   });
   

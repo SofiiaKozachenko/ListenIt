@@ -74,7 +74,7 @@ function speak(text) {
   currentUtterance.voice = selectedVoice || null;
   //currentUtterance.lang = settings.autoDetectLanguage ? detectLanguage(text) : settings.language || "uk-UA";
   currentUtterance.rate = settings.speechRate || 1;
-  //currentUtterance.pitch = settings.speechPitch || 1;
+  currentUtterance.pitch = settings.speechPitch || 1;
 
   currentUtterance.onerror = (e) => console.error("Помилка озвучення:", e);
 
@@ -83,11 +83,9 @@ function speak(text) {
 
 function detectLanguage(text) {
   const ukrainianPattern = /[а-яіїєґ]/i;
-  const russianPattern = /[а-яё]/i;
   const englishPattern = /[a-z]/i;
 
   if (ukrainianPattern.test(text)) return "uk-UA";
-  if (russianPattern.test(text)) return "ru-RU";
   if (englishPattern.test(text)) return "en-US";
   return "uk-UA";
 }
