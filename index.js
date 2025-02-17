@@ -1,14 +1,14 @@
-/*document.getElementById('hoverModeBtn').addEventListener('click', function() {
+document.getElementById('hoverModeBtn').addEventListener('click', function() {
     window.location.href = 'test2.html';
-});*/
+});
   
-/*document.getElementById('fullPageMode').addEventListener('click', function() {
+document.getElementById('fullPageMode').addEventListener('click', function() {
     window.location.href = 'test2.html';
-});*/
+});
   
-/*document.getElementById('selectedTextMode').addEventListener('click', function() {
+document.getElementById('selectedTextMode').addEventListener('click', function() {
     window.location.href = 'test2.html';
-});*/
+});
   
 document.getElementById('cross').addEventListener('click', function() {
     window.close(); // Закриває спливаюче вікно розширення
@@ -39,16 +39,13 @@ function speak(text) {
     const fullPageModeBtn = document.getElementById("fullPageMode");
     const selectedTextModeBtn = document.getElementById("selectedTextMode");
 
-    // Завантаження збереженого режиму
     chrome.storage.sync.get("settings", (data) => {
         console.log("Отримані налаштування:", data);
         const settings = data.settings || { mode: "defaultMode" };
 
-        // Виділяємо активну кнопку
         highlightActiveMode(settings.mode);
     });
 
-    // Функція для збереження вибраного режиму
     function saveModeSettings(selectedMode) {
         chrome.storage.sync.set({ settings: { mode: selectedMode } }, () => {
             console.log("Режим збережено:", { mode: selectedMode });
@@ -57,19 +54,17 @@ function speak(text) {
         });
     }
 
-    // Функція для підсвічування активного режиму
     function highlightActiveMode(activeMode) {
         document.querySelectorAll(".button-style").forEach(btn => {
-            btn.classList.remove("active-mode"); // Видаляємо підсвічування з усіх кнопок
+            btn.classList.remove("active-mode");
         });
 
         const activeButton = document.getElementById(activeMode);
         if (activeButton) {
-            activeButton.classList.add("active-mode"); // Додаємо підсвічування
+            activeButton.classList.add("active-mode"); 
         }
     }
 
-    // Функція для красивого відображення назв режимів в alert
     function getModeName(modeId) {
         switch (modeId) {
             case "hoverModeBtn": return "При наведенні мишки";
@@ -79,12 +74,19 @@ function speak(text) {
         }
     }
 
-    // Додаємо обробники подій для кнопок
     hoverModeBtn.addEventListener("click", () => saveModeSettings("hoverModeBtn"));
     fullPageModeBtn.addEventListener("click", () => saveModeSettings("fullPageMode"));
     selectedTextModeBtn.addEventListener("click", () => saveModeSettings("selectedTextMode"));
 });
 
-
-
+document.addEventListener("DOMContentLoaded", function () {
+    chrome.storage.sync.get("settings", (data) => {
+      const settings = data.settings || {};
+      console.log("Отримані налаштування:", settings);
+      
+      if (settings.speechRate) {
+        document.getElementById("speechRate").value = settings.speechRate;
+      }
+    });
+  });
   

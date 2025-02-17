@@ -54,36 +54,57 @@ function speak(text) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const voiceSelect = document.getElementById("voice-btn");
   const speechRateInput = document.getElementById("speechRate");
-  const speechPitchInput = document.getElementById("toneRate");
+  const speechInput = document.getElementById("speedInput");
+  const toneRateInput = document.getElementById("toneRate");
+  const toneInput = document.getElementById("toneInput");
   const saveSettingsButton = document.getElementById("applyButton");
 
   chrome.storage.sync.get("settings", (data) => {
     const settings = data.settings || {};
-    if (settings.selectedVoice) {
-        voiceSelect.value = settings.selectedVoice;
-    }
+
     speechRateInput.value = settings.speechRate || 1;
-    speechPitchInput.value = settings.speechPitch || 1;
+    speechInput.value = settings.speechRate || 1;
+    toneRateInput.value = settings.toneRate || 1;
+    toneInput.value = settings.toneRate || 1;
   });
 
-// Збереження налаштувань
   function saveSettings() {
     const settings = {
-        selectedVoice: voiceSelect.value || "",
-        speechRate: parseFloat(speechRateInput.value),
-        speechPitch: parseFloat(speechPitchInput.value),
+      speechRate: parseFloat(speechRateInput.value),
+      toneRate: parseFloat(toneRateInput.value),
     };
 
     chrome.storage.sync.set({ settings }, () => {
-        alert("Налаштування збережено!");
+      console.log("Налаштування збережено!", settings);
     });
   }
 
-  if (saveSettingsButton) {
-    saveSettingsButton.addEventListener("click", (event) => {
-        saveSettings();
-    });
+  function speak(text, speechRate, toneRate) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.rate = speechRate;
+    speech.pitch = toneRate;
+    window.speechSynthesis.speak(speech);
   }
+
+  saveSettingsButton.addEventListener("click", () => {
+    saveSettings();
+
+    const exampleText = "Текст для перевірки швидкості та тону озвучення!";
+
+    const speechRate = parseFloat(speechRateInput.value) || 1;
+    const toneRate = parseFloat(toneRateInput.value) || 1;
+
+    speak(exampleText, speechRate, toneRate);
+  });
+
+  function syncInputs(input, output) {
+    output.value = input.value;
+  }
+
+  speechRateInput.addEventListener("input", () => syncInputs(speechRateInput, speechInput));
+  toneRateInput.addEventListener("input", () => syncInputs(toneRateInput, toneInput));
+
+  speechInput.addEventListener("input", () => syncInputs(speechInput, speechRateInput));
+  toneInput.addEventListener("input", () => syncInputs(toneInput, toneRateInput));
 });

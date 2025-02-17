@@ -103,7 +103,7 @@ input[type="range"]:focus {
     background-color: rgb(31 45 93);
     padding: 34.5px 8px;
     box-shadow: inset 4px 4px 4px 0 rgb(42 58 110 / 100%);
-}
+  }
 
   .modeIcon {
     width: 40px;
@@ -124,21 +124,45 @@ input[type="range"]:focus {
   .speedControl, .toneControl {
     display: flex;
     flex-direction: column;
+    gap: 10px;
     margin-top: 30px;
   }
 
-  .toneControl{
-    margin-top: 20px;
+  .speedInputControl, .toneInputControl {
+    display: flex;
+    align-items: center;
   }
 
-  .speedLabel {
+  .speedLabel, .toneLabel {
+    margin-right: 20px;
     font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
     color: rgb(21 21 22);
   }
 
+  #speedInput, #toneInput {
+    width: 60px;
+    height: 40px;
+    padding: 5px;
+    font-size: 24px;
+    background-color: #B6BFDA;
+    text-align: center;
+    border: 1px solid #A0A4A8;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+  }
+
+  #speedInput::-webkit-outer-spin-button,
+  #speedInput::-webkit-inner-spin-button,
+  #toneInput::-webkit-outer-spin-button,
+  #toneInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   .sliderContainer {
-    position: relative;
+    width: 100%; /* Ensure the slider takes up the full width */
     min-height: 64px;
+    margin-top: 10px; /* Optional: Add space between the input and slider */
   }
 
   .sliderIcon {
