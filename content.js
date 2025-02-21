@@ -20,11 +20,15 @@ chrome.storage.sync.get("settings", (data) => {
   loadVoices();
 });
 
-
+const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
 
 function isTextContent(element) {
-  if (settings.ignoreAds && element.closest(".ad")) return false;
+  if (settings.ignoreAds && isAd(element)) return false;
   return element.innerText?.trim() || element.alt || element.title;
+}
+
+function isAd(element) {
+  return adSelectors.some(selector => element.closest(selector));
 }
 
 function loadVoices() {
@@ -55,12 +59,10 @@ function handleTabFocus(event) {
 
 function handleTextSelection() {
   const selectedText = window.getSelection().toString().trim();
-  if (selectedText ) {
+  if (selectedText) {
     speak(selectedText);
   }
 }
-
-
 
 function speak(text) {
   if (!voicesLoaded) {
@@ -76,7 +78,7 @@ function speak(text) {
   currentUtterance = new SpeechSynthesisUtterance(text);
   const selectedVoice = voices.find(v => v.name === settings.selectedVoice);
   currentUtterance.voice = selectedVoice || null;
-  currentUtterance.lang = settings.autoDetectLanguage ? detectLanguage(text) : settings.language || "uk-UA";
+  currentUtterance.lang =  detectLanguage(text) || "uk-UA";
   currentUtterance.rate = settings.speechRate || 1;
   currentUtterance.pitch = settings.speechPitch || 1;
 
@@ -97,12 +99,13 @@ function detectLanguage(text) {
 }
 
 function observeAndReadPageContent() {
-  readPageContent(); // Одразу озвучуємо сторінку при завантаженні
+  removeAds();
+  readPageContent();
 
-  // Відстежуємо зміни DOM
   const observer = new MutationObserver(() => {
-    observer.disconnect(); // Зупиняємо, щоб уникнути дублювання
-    readPageContent(); // Озвучуємо сторінку
+    observer.disconnect();
+    removeAds();
+    readPageContent();
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
@@ -113,6 +116,12 @@ function readPageContent() {
   if (pageText) {
     speak(pageText);
   }
+}
+
+function removeAds() {
+  adSelectors.forEach(selector => {
+    document.querySelectorAll(selector).forEach(ad => ad.remove());
+  });
 }
 
 

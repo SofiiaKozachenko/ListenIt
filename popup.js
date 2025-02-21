@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const autoDetectLanguageCheckbox = document.getElementById("autoDetectLanguage");
   const ignoreAdsCheckbox = document.getElementById("ignoreAds");
   const voiceSelect = document.getElementById("voiceSelect");
-  const languageSelect = document.getElementById("languageSelect");
   const speechRateInput = document.getElementById("speechRate");
   const speechPitchInput = document.getElementById("speechPitch");
   const saveSettingsButton = document.getElementById("saveSettings");
@@ -38,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       autoDetectLanguageCheckbox.checked = settings.autoDetectLanguage || false;
       ignoreAdsCheckbox.checked = settings.ignoreAds || false;
-      languageSelect.value = settings.language || "uk-UA";
+      
       speechRateInput.value = settings.speechRate || 1;
       speechPitchInput.value = settings.speechPitch || 1;
 
@@ -61,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     autoDetectLanguage: autoDetectLanguageCheckbox.checked,
     ignoreAds: ignoreAdsCheckbox.checked,
     selectedVoice: voiceSelect.value || "",
-    language: languageSelect.value,
+    
     speechRate: parseFloat(speechRateInput.value),
     speechPitch: parseFloat(speechPitchInput.value),
   };
