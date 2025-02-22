@@ -3,108 +3,114 @@ let currentUtterance = null;
 let voices = [];
 let voicesLoaded = false;
 
+// Завантаження налаштувань та ініціалізація
 chrome.storage.sync.get("settings", (data) => {
   settings = data.settings || {};
-
-  if (settings.mode === 'hoverModeBtn') {
-    document.addEventListener("mouseover", handleMouseOver);
-    document.addEventListener("focusin", handleTabFocus);
-  } else if (settings.mode === 'fullPageMode') {
-    window.addEventListener("load", observeAndReadPageContent);
-  } else if (settings.mode === 'selectedTextMode') {
-    document.addEventListener("mouseup", handleTextSelection);
-  } else {
-    document.addEventListener("focusin", handleTabFocus);
-  }
-
   loadVoices();
+  
+  switch (settings.mode) {
+    case 'hoverModeBtn':
+      document.addEventListener("mouseover", handleMouseOver);
+      break;
+    case 'fullPageMode':
+      window.addEventListener("load", observeAndReadPageContent);
+      break;
+    case 'selectedTextMode':
+      document.addEventListener("mouseup", handleTextSelection);
+      break;
+    default:
+      document.addEventListener("focusin", handleTabFocus);
+  }
 });
 
-function isTextContent(element) {
-  if (settings.ignoreAds && element.closest(".ad")) return false;
-  return element.innerText?.trim() || element.alt || element.title;
-}
+let voicesLoadedPromise = null;
 
 function loadVoices() {
-  voices = speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    voicesLoaded = true;
-  } else {
-    setTimeout(loadVoices, 100);
-  }
+    if (!voicesLoadedPromise) {
+        voicesLoadedPromise = new Promise(resolve => {
+            const checkVoices = () => {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    resolve(voices);
+                } else {
+                    setTimeout(checkVoices, 100);
+                }
+            };
+            
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {
+                    const voices = speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        resolve(voices);
+                    }
+                };
+            }
+            checkVoices();
+        });
+    }
+    
+    return voicesLoadedPromise;
+}
+
+async function speak(text) {
+    if (!text.trim()) {
+        console.warn("⚠️ Порожній текст не може бути озвучений.");
+        return;
+    }
+
+    if (currentUtterance) {
+        speechSynthesis.cancel();
+        currentUtterance = null;
+    }
+
+    try {
+        await loadVoices();
+        
+        currentUtterance = new SpeechSynthesisUtterance(text);
+        let selectedVoice = null;
+        
+        if (settings.selectedVoice) {
+            selectedVoice = voices.find(v => v.name === settings.selectedVoice);
+            if (!selectedVoice) {
+                console.warn(`⚠️ Обраний голос '${settings.selectedVoice}' не знайдено. Використовується стандартний.`);
+            }
+        }
+
+        currentUtterance.voice = selectedVoice || voices[0];
+        currentUtterance.rate = settings.speechRate || 1;
+        currentUtterance.pitch = settings.toneRate || 1;
+        
+        speechSynthesis.speak(currentUtterance);
+    } catch (error) {
+        console.error(`❌ Помилка при спробі озвучення: ${error.message}`);
+    }
 }
 
 function handleMouseOver(event) {
-  const target = event.target;
-  if (target instanceof HTMLElement && isTextContent(target)) {
-    const text = target.innerText.trim();
-    if (text.length > 1500) return;
-    if (text) speak(text);
+  if (isTextContent(event.target)) {
+    speak(event.target.innerText.trim());
   }
 }
 
 function handleTabFocus(event) {
-  const target = event.target;
-  if (target instanceof HTMLElement && isTextContent(target)) {
-    const text = target.innerText.trim();
-    if (text) speak(text);
+  if (isTextContent(event.target)) {
+    speak(event.target.innerText.trim());
   }
 }
 
 function handleTextSelection() {
   const selectedText = window.getSelection().toString().trim();
-  if (selectedText ) {
-    speak(selectedText);
-  }
+  if (selectedText) speak(selectedText);
 }
 
-function speak(text) {
-  if (!voicesLoaded) {
-    setTimeout(() => speak(text), 100);
-    return;
-  }
-
-  if (currentUtterance) {
-    speechSynthesis.cancel();
-    currentUtterance = null;
-  }
-
-  currentUtterance = new SpeechSynthesisUtterance(text);
-  const selectedVoice = voices.find(v => v.name === settings.selectedVoice);
-  currentUtterance.voice = selectedVoice || null;
-  //currentUtterance.lang = settings.autoDetectLanguage ? detectLanguage(text) : settings.language || "uk-UA";
-  currentUtterance.rate = settings.speechRate || 1;
-  currentUtterance.pitch = settings.speechPitch || 1;
-
-  currentUtterance.onerror = (e) => console.error("Помилка озвучення:", e);
-
-  speechSynthesis.speak(currentUtterance);
-}
-
-function detectLanguage(text) {
-  const ukrainianPattern = /[а-яіїєґ]/i;
-  const englishPattern = /[a-z]/i;
-
-  if (ukrainianPattern.test(text)) return "uk-UA";
-  if (englishPattern.test(text)) return "en-US";
-  return "uk-UA";
+function isTextContent(element) {
+  return element instanceof HTMLElement && !element.closest(".ad") && (element.innerText?.trim() || element.alt || element.title);
 }
 
 function observeAndReadPageContent() {
-  readPageContent(); // Одразу озвучуємо сторінку при завантаженні
+  speak(document.body.innerText.trim());
 
-  // Відстежуємо зміни DOM
-  const observer = new MutationObserver(() => {
-    observer.disconnect(); // Зупиняємо, щоб уникнути дублювання
-    readPageContent(); // Озвучуємо сторінку
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
-function readPageContent() {
-  const pageText = document.body.innerText.trim();
-  if (pageText) {
-    speak(pageText);
-  }
+  new MutationObserver(() => {
+    speak(document.body.innerText.trim());
+  }).observe(document.body, { childList: true, subtree: true });
 }

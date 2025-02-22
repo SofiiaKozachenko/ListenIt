@@ -79,14 +79,25 @@ function speak(text) {
     selectedTextModeBtn.addEventListener("click", () => saveModeSettings("selectedTextMode"));
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    chrome.storage.sync.get("settings", (data) => {
-      const settings = data.settings || {};
-      console.log("Отримані налаштування:", settings);
-      
-      if (settings.speechRate) {
-        document.getElementById("speechRate").value = settings.speechRate;
-      }
+document.addEventListener("DOMContentLoaded", () => {
+  const modeButtons = document.querySelectorAll(".button-style");
+
+  modeButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const selectedMode = button.id;
+
+      chrome.storage.sync.get("settings", ({ settings = {} }) => {
+        const updatedSettings = { ...settings, mode: selectedMode };
+
+        chrome.storage.sync.set({ settings: updatedSettings }, () => {
+          console.log(`✅ Режим '${selectedMode}' збережено.`);
+          setTimeout(() => {
+            window.location.href = "test2.html"; // Переходимо після збереження
+          }, 100); // Затримка для гарантії запису
+        });
+      });
     });
   });
-  
+});
+
+

@@ -6,63 +6,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveSettingsButton = document.getElementById("saveSettings");
   const stopSpeechButton = document.getElementById("stopSpeech");
 
-  // Завантаження голосів
+  let voices = [];
+
+  // ✅ Завантаження голосів із гарантією доступності
+  function loadVoices() {
+    voices = speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      speechSynthesis.onvoiceschanged = () => {
+        voices = speechSynthesis.getVoices();
+        populateVoices();
+        loadSettings(); // Завантаження налаштувань після доступу до голосів
+      };
+    } else {
+      populateVoices();
+      loadSettings(); // Якщо голоси вже є, можна завантажувати налаштування
+    }
+  }
+
+  // ✅ Заповнення списку голосів
   function populateVoices() {
-    const voices = speechSynthesis.getVoices();
+    if (!voiceSelect) return;
+
     voiceSelect.innerHTML = voices
       .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
       .join("");
   }
 
-  // Завантаження збережених налаштувань
+  // ✅ Завантаження збережених налаштувань
   function loadSettings() {
-    chrome.storage.sync.get("settings", (data) => {
-      const settings = data.settings || {};
+  chrome.storage.sync.get("settings", (data) => {
+    const settings = data.settings || {};
 
-      // Встановлення значень у UI
-      hoverModeCheckbox.checked = settings.hoverMode || false;
-      autoDetectLanguageCheckbox.checked = settings.autoDetectLanguage || false;
-      speechRateInput.value = settings.speechRate || 1;
-
-      // Встановлення обраного голосу
-      const voices = speechSynthesis.getVoices();
-      if (settings.selectedVoice) {
-        const selectedVoice = voices.find(voice => voice.name === settings.selectedVoice);
-        if (selectedVoice) {
-          voiceSelect.value = selectedVoice.name;
-        }
-      }
-    });
-  }
-
-  // Озвучення тестового тексту при зміні голосу
-  function testVoice() {
-    const selectedVoiceName = voiceSelect.value;
-    const testText = "Це тестовий текст для перевірки голосу.";
-    const utterance = new SpeechSynthesisUtterance(testText);
+    hoverModeCheckbox.checked = settings.hoverMode || false;
+    autoDetectLanguageCheckbox.checked = settings.autoDetectLanguage || false;
+    speechRateInput.value = settings.speechRate || 1;
 
     const voices = speechSynthesis.getVoices();
-    const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+    if (settings.selectedVoice) {
+      const selectedVoice = voices.find(voice => voice.name === settings.selectedVoice);
+      if (selectedVoice) {
+        voiceSelect.value = selectedVoice.name;
+      }
     }
-    utterance.rate = parseFloat(speechRateInput.value) || 1;
+  });
+}
 
+
+  // ✅ Озвучення тестового тексту при зміні голосу
+  function testVoice() {
+    const selectedVoiceName = voiceSelect.value;
+    const utterance = new SpeechSynthesisUtterance("Це тестовий текст для перевірки голосу.");
+    utterance.voice = voices.find(voice => voice.name === selectedVoiceName) ?? null;
+    utterance.rate = parseFloat(speechRateInput.value) || 1;
     speechSynthesis.speak(utterance);
   }
 
-  // Зупинка озвучення
-  stopSpeechButton.addEventListener("click", () => {
-    speechSynthesis.cancel(); // Зупиняє всі поточні озвучення
-  });
-
-  // Збереження налаштувань
-  saveSettingsButton.addEventListener("click", () => {
+  // ✅ Збереження налаштувань
+  saveSettingsButton?.addEventListener("click", () => {
     const settings = {
-      hoverMode: hoverModeCheckbox.checked,
-      autoDetectLanguage: autoDetectLanguageCheckbox.checked,
-      selectedVoice: voiceSelect.value,
-      speechRate: parseFloat(speechRateInput.value),
+      hoverMode: hoverModeCheckbox?.checked ?? false,
+      autoDetectLanguage: autoDetectLanguageCheckbox?.checked ?? false,
+      selectedVoice: voiceSelect?.value ?? "",
+      speechRate: parseFloat(speechRateInput?.value) || 1,
     };
 
     chrome.storage.sync.set({ settings }, () => {
@@ -70,14 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Прив'язка події зміни голосу
-  voiceSelect.addEventListener("change", testVoice);
+  // ✅ Зупинка озвучення
+  stopSpeechButton?.addEventListener("click", () => {
+    speechSynthesis.cancel();
+  });
 
-  // Завантаження голосів при ініціалізації
-  populateVoices();
-  speechSynthesis.onvoiceschanged = populateVoices;
-
-  // Завантаження налаштувань при відкритті popup
+  // ✅ Тестування голосу при зміні
+  voiceSelect?.addEventListener("change", testVoice);
+  
   loadSettings();
-});
 
+  // ✅ Ініціалізація
+  loadVoices(); // Завантаження голосів та налаштувань
+});
