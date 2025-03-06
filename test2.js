@@ -10,6 +10,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let selectedVoice = null;
 
+  chrome.storage.sync.get("settings", (data) => {
+    const settings = data.settings || { mode: "defaultMode" };  // За замовчуванням mode = "defaultMode"
+    
+    console.log("Збережені налаштування:", settings);
+  
+    if (settings.mode) {
+      console.log("Режим:", settings.mode);
+    } else {
+      console.log("Режим не знайдено, використовуються стандартні налаштування.");
+    }
+  });
+  
   function populateVoices() {
     const voices = speechSynthesis.getVoices();
     voiceList.innerHTML = "";
@@ -21,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
       voiceOption.classList.add("dropdown-item");
 
       voiceOption.addEventListener("click", () => {
-        selectedVoice = voice.name;  // Зберігаємо обраний голос у змінну
+        selectedVoice = voice.name;
         voiceBtn.textContent = voiceOption.textContent;
       });
 
@@ -35,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
     populateVoices();
   }
 
-  // Завантаження налаштувань
   chrome.storage.sync.get("settings", ({ settings = {} }) => {
     speechRateInput.value = settings.speechRate || 1;
     speechInput.value = settings.speechRate || 1;
@@ -60,15 +71,21 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     chrome.storage.sync.set({ settings }, () => {
-      console.log("✅ Налаштування збережено:", settings);
+      console.log("Налаштування збережено:", settings);
     });
   }
 
   saveSettingsButton.addEventListener("click", () => {
     saveSettings();
+    
+    chrome.storage.sync.get("settings", ({ settings = {} }) => {
+      console.log("Збережені налаштування:", settings);
+    });
+  
     const exampleText = "Текст для перевірки швидкості, тембру та голосу!";
     speak(exampleText, parseFloat(speechRateInput.value), parseFloat(toneRateInput.value), selectedVoice);
   });
+  
 
   function speak(text, speechRate, toneRate, voiceName) {
     const utterance = new SpeechSynthesisUtterance(text);
@@ -99,5 +116,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById('cross').addEventListener('click', () => window.close());
-  
 });
