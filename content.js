@@ -6,13 +6,15 @@ let voicesLoaded = false;
 chrome.storage.sync.get("settings", (data) => {
   settings = data.settings || {};
 
-  if (settings.mode === 'hoverMode') {
+  if (settings.mode === 'hover') {
     document.addEventListener("mouseover", handleMouseOver);
     document.addEventListener("focusin", handleTabFocus);
-  } else if (settings.mode === 'readPageMode') {
+  } else if (settings.mode === 'readPage') {
     window.addEventListener("load", observeAndReadPageContent);
-  } else if (settings.mode === 'selectionMode') {
+  document.addEventListener("focusin", handleTabFocus);
+  } else if (settings.mode === 'selection') {
     document.addEventListener("mouseup", handleTextSelection);
+    document.addEventListener("focusin", handleTabFocus);
   } else {
     document.addEventListener("focusin", handleTabFocus);
   }
@@ -63,10 +65,45 @@ function handleTextSelection() {
     speak(selectedText);
   }
 }
+document.addEventListener("click", () => {
+    console.log("Розблокування синтезу мови...");
+    userInteracted = true; // Відзначаємо, що була взаємодія
+    if (settings.mode === 'readPage') {
+        observeAndReadPageContent();
+    }
+}, { once: true });
+
+let userInteracted = false; // Перевіряємо, чи була взаємодія користувача
+
+chrome.storage.sync.get("settings", (data) => {
+    settings = data.settings || {};
+
+    if (settings.mode === 'readPage') { 
+        window.addEventListener("load", () => {
+            if (userInteracted) {
+                observeAndReadPageContent();
+            }
+        });
+    }
+
+    if (settings.mode === 'selection' || settings.mode === 'readPage') {
+        document.addEventListener("focusin", (event) => {
+            if (userInteracted) {
+                handleTabFocus(event);
+            }
+        });
+    }
+});
 
 function speak(text) {
+  if (!text.trim()) {
+    console.error("Текст для озвучення порожній.");
+    return;
+  }
+
   if (!voicesLoaded) {
-    setTimeout(() => speak(text), 100);
+    console.warn("Голоси ще не завантажилися. Чекаємо...");
+    setTimeout(() => speak(text), 500);
     return;
   }
 
@@ -76,16 +113,43 @@ function speak(text) {
   }
 
   currentUtterance = new SpeechSynthesisUtterance(text);
+  
+  // Вибираємо голос
   const selectedVoice = voices.find(v => v.name === settings.selectedVoice);
-  currentUtterance.voice = selectedVoice || null;
-  currentUtterance.lang =  detectLanguage(text) || "uk-UA";
+  if (!selectedVoice) {
+    console.warn("Вибраний голос не знайдено, використовується стандартний.");
+  }
+  currentUtterance.voice = selectedVoice || voices[0] || null;
+
+  // Визначаємо мову
+  currentUtterance.lang = detectLanguage(text) || "uk-UA";
   currentUtterance.rate = settings.speechRate || 1;
   currentUtterance.pitch = settings.speechPitch || 1;
 
-  currentUtterance.onerror = (e) => console.error("Помилка озвучення:", e);
+ currentUtterance.onerror = (e) => {
+    console.error("Помилка озвучення:", e.error);
+    console.error("Деталі помилки:", e);
 
-  speechSynthesis.speak(currentUtterance);
+    if (e.error === "not-allowed") {
+        console.warn("Доступ до синтезу мови заблоковано браузером. Перевірте дозволи.");
+    } else if (e.error === "interrupted") {
+        console.warn("Озвучення перервано.");
+    } else if (e.error === "audio-busy") {
+        console.warn("Аудіо-засіб зайнятий, спробуйте ще раз.");
+    } else {
+        console.warn("Невідома помилка озвучення.");
+    }
+};
+
+
+  try {
+    speechSynthesis.speak(currentUtterance);
+  } catch (err) {
+    console.error("Помилка під час спроби озвучення:", err);
+  }
 }
+
+
 
 function detectLanguage(text) {
   const ukrainianPattern = /[а-яіїєґ]/i;
@@ -118,9 +182,17 @@ function readPageContent() {
   }
 }
 
+function speakParagraphs(paragraphs, index) {
+  if (index < paragraphs.length) {
+    speak(paragraphs[index]);
+    currentUtterance.onend = () => {
+      requestAnimationFrame(() => speakParagraphs(paragraphs, index + 1));
+    };
+  }
+}
+
 function removeAds() {
   adSelectors.forEach(selector => {
     document.querySelectorAll(selector).forEach(ad => ad.remove());
   });
 }
-

@@ -36,11 +36,12 @@
           <input type="range" id="toneRate" min="0.5" max="2" step="0.25" value="0.5">
         </div>
       </div>
- <div>
-    <label for="voiceSelect">Обрати голос:</label>
-    <select id="voiceSelect"></select>
-  </div>
 
+<div class="dropdown">
+    <p class="speedLabel">Оберіть голос:</p>
+    <button class="dropdown-btn" id="voice-btn"></button>
+    <div class="dropdown-content" id="voice-list"></div>
+</div>
 <div class="adBlockToggle">
         <input type="checkbox" id="ignoreAds" class="hidden">
         <label for="ignoreAds">

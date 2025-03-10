@@ -210,7 +210,7 @@ input[type="range"]:focus {
   color: rgb(21 21 22);
 }
 
-#speedInput, #speechPitch {
+#speechRate, #speechPitch {
   width: 60px;
   height: 40px;
   padding: 5px;
@@ -270,7 +270,10 @@ input[type="range"]:focus {
   font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
   color: rgb(21 21 22);
 }
-
+.button-style.active {
+    background-color: #007bff; /* Або інший колір */
+    color: white;
+}
 #saveSettings {
   background-color: rgb(31, 45, 93);
   width: 641px;
@@ -307,63 +310,63 @@ input[type="range"]:focus {
 }
 
 .dropdown {
-  position: relative;
-  display: inline-block;
-  width: 641px;
+    position: relative;
+    display: inline-block;
+    width: 641px;
 }
 
 .dropdown-btn {
-  font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
-  background-color: #1F2D5D;
-  height: 90px;
-  color: white;
-  padding: 10px;
-  width: 100%;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  position: relative;
-  text-overflow: ellipsis;
+    font: 400 32px/1.22 Inter, Helvetica, Arial, serif;
+    background-color: #1F2D5D;
+    height: 90px;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    position: relative;
+    text-overflow: ellipsis;
 }
 
 .dropdown-btn::after {
-  content: " ▼";
-  position: absolute;
-  right: 10px;
+    content: " ▼";
+    position: absolute;
+    right: 10px;
 }
 
 .dropdown-content {
-  font: 400 30px/1.22 Inter, Helvetica, Arial, serif;
-  display: none;
-  position: absolute;
-  background-color: #CCD4EF;
-  width: 100%;
-  overflow: hidden;
-  z-index: 1;
-  max-height: 200px;
-  overflow-y: auto;
+    font: 400 30px/1.22 Inter, Helvetica, Arial, serif;
+    display: none;
+    position: absolute;
+    background-color: #CCD4EF;
+    width: 100%;
+    overflow: hidden;
+    z-index: 1;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .dropdown-item:nth-child(even) {
-  background-color: #B6BFDA;
+    background-color: #B6BFDA;
 }
 
 .dropdown-item:nth-child(odd) {
-  background-color: #CCD4EF;
+    background-color: #CCD4EF;
 }
 
 .dropdown-content div {
-  text-align: center;
-  height: 90px;
-  cursor: pointer;
-  border-bottom: 1px solid #ddd;
-  text-overflow: ellipsis;
+    text-align: center;
+    height: 90px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    text-overflow: ellipsis;
 }
 
 .dropdown-content div:hover {
-  background-color: #f1f1f1;
+    background-color: #f1f1f1;
 }
 
 .dropdown-content.show {
-  display: block;
+    display: block;
 }
