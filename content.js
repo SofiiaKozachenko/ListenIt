@@ -149,8 +149,6 @@ function speak(text) {
   }
 }
 
-
-
 function detectLanguage(text) {
   const ukrainianPattern = /[а-яіїєґ]/i;
   const russianPattern = /[а-яё]/i;

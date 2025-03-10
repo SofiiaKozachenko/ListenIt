@@ -6,19 +6,20 @@
   <title>Налаштування озвучення</title>
   <link rel="stylesheet" href="style.css">
 </head>
- <section class="listen-it">
+<body>
+  <section class="listen-it">
     <div class="contentWrapper">
       <p class="appTitle">ListenIt</p>
       <img id="cross" class="cross" src="/cross.svg" alt="Close icon" />
       <p class="welcomeMsg" id="welcomeMessage">Вітаємо у голосовому помічникові “ListenIt”. Оберіть режим використання.</p>
       <p class="instructions" id="instructionsMessage">Для навігації ви можете натиснути на таб, або навести мишкою на екран.</p>
+      
       <button class="button-style hoverMode" id="hoverMode">При наведенні мишки</button>
       <button class="button-style fullPageMode" id="readPageMode">Весь вміст сторінки</button>
       <button class="button-style selectedTextMode" id="selectionMode">Виділений текст</button>
       <button class="button-style stopMode" id="stopSpeech">Стоп</button>
-
-
-  <div class="speedControl">
+      
+      <div class="speedControl">
         <div class="speedInputControl">
           <p class="speedLabel">Оберіть швидкість:</p>
           <input type="number" id="speechRate" min="0.5" max="2" step="0.25" value="0.5">
@@ -27,7 +28,8 @@
           <input type="range" id="speechRate2" min="0.5" max="2" step="0.25" value="0.5">
         </div>
       </div>
-<div class="toneControl">
+      
+      <div class="toneControl">
         <div class="toneInputControl">
           <p class="speedLabel">Оберіть тембр:</p>
           <input type="number" id="speechPitch" min="0.5" max="2" step="0.25" value="0.5">
@@ -36,25 +38,25 @@
           <input type="range" id="toneRate" min="0.5" max="2" step="0.25" value="0.5">
         </div>
       </div>
-
-<div class="dropdown">
-    <p class="speedLabel">Оберіть голос:</p>
-    <button class="dropdown-btn" id="voice-btn"></button>
-    <div class="dropdown-content" id="voice-list"></div>
-</div>
-<div class="adBlockToggle">
+      
+      <div class="dropdown">
+        <p class="speedLabel">Оберіть голос:</p>
+        <button class="dropdown-btn" id="voice-btn"></button>
+        <div class="dropdown-content" id="voice-list"></div>
+      </div>
+      
+      <div class="adBlockToggle">
         <input type="checkbox" id="ignoreAds" class="hidden">
         <label for="ignoreAds">
           <span class="checkmark"></span>
         </label>
         <p class="adBlockLabel">Режим ігнорування реклами</p>
       </div>
-
- <button id="saveSettings">Застосувати зміни</button>
+      
+      <button id="saveSettings">Застосувати зміни</button>
+    </div>
+  </section>
   
-  
- 
- 
   <script src="popup.js"></script>
 </body>
 </html>

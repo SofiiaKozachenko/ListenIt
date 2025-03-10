@@ -12,17 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveSettingsButton = document.getElementById("saveSettings");
     const stopSpeechButton = document.getElementById("stopSpeech");
     let selectedVoice = null;
-    let voices = []; // Зберігаємо голоси тут
-window.addEventListener('load', () => {
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const instructionsMessage = document.getElementById('instructionsMessage');
-        speak(welcomeMessage.innerText);
-        speak(instructionsMessage.innerText);
-    });
-    function populateVoices() {
-        voices = speechSynthesis.getVoices(); // Отримуємо голоси тут
-        voiceList.innerHTML = "";
+    let voices = [];
 
+    document.getElementById('cross').addEventListener('click', () => window.close());
+
+    function populateVoices() {
+        voices = speechSynthesis.getVoices(); 
+        voiceList.innerHTML = "";
+    
+        voiceBtn.textContent = "Оберіть голос";
+    
         voices.forEach(voice => {
             const voiceItem = document.createElement("div");
             voiceItem.textContent = `${voice.name} (${voice.lang})`;
@@ -35,22 +34,44 @@ window.addEventListener('load', () => {
             });
             voiceList.appendChild(voiceItem);
         });
-
-        if (voices.length > 0) {
-            if (selectedVoice) {
-                const foundVoice = voices.find(voice => voice.name === selectedVoice);
-                if (foundVoice) {
-                    voiceBtn.textContent = `${foundVoice.name} (${foundVoice.lang})`;
-                } else {
-                    voiceBtn.textContent = `${voices[0].name} (${voices[0].lang})`;
-                    selectedVoice = voices[0].name;
-                }
-            } else {
-                voiceBtn.textContent = `${voices[0].name} (${voices[0].lang})`;
-                selectedVoice = voices[0].name;
-            }
+    
+        if (voices.length > 0 && !selectedVoice) {
+            selectedVoice = voices[0].name;
         }
+    }       
+
+    function speak(text) {
+        if (!text) return;
+    
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = speechSynthesis.getVoices();
+        
+        const selected = voices.find(voice => voice.name === selectedVoice);
+        utterance.voice = selected || voices[0];
+        
+        utterance.rate = 1;
+        utterance.pitch = 1; 
+        speechSynthesis.speak(utterance);
     }
+
+    window.addEventListener('load', () => {
+        populateVoices();
+    
+        setTimeout(() => {
+            console.log("Trying to speak...");
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const instructionsMessage = document.getElementById('instructionsMessage');
+    
+            if (!instructionsMessage || !welcomeMessage) {
+                console.error("Element not found!");
+                return;
+            }
+    
+            speak(welcomeMessage.innerText);
+            speak(instructionsMessage.innerText);
+        }, 1000); 
+    });
+    
 
     voiceBtn.addEventListener("click", () => {
         voiceList.classList.toggle("show");
@@ -196,6 +217,22 @@ window.addEventListener('load', () => {
 
     document.getElementById("selectionMode").addEventListener("click", () => {
         updateMode("selectionMode");
+    });
+
+    document.getElementById("hoverMode").addEventListener("focus", () => {
+        speak("Режим читання наведенням мишки");
+    });
+    
+    document.getElementById("readPageMode").addEventListener("focus", () => {
+        speak("Режим читання всього тексту");
+    });
+    
+    document.getElementById("selectionMode").addEventListener("focus", () => {
+        speak("Режим читання виділеного тексту");
+    });
+
+    document.getElementById("stopSpeech").addEventListener("focus", () => {
+        speak("Кнопка для зупинки озвучення");
     });
 
     loadSettings();

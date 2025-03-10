@@ -58,8 +58,16 @@ body {
   font-size: 30px;
 }
 
+.button-style:hover, .button-style:focus {
+  background-color: #2C3D73;
+}
+
 .stopMode {
   background-color: rgb(132, 0, 2);
+}
+
+.stopMode:hover, .stopMode:focus {
+  background-color: #AB0205;
 }
 
 .cross {
@@ -222,10 +230,10 @@ input[type="range"]:focus {
   transition: background-color 0.3s ease;
 }
 
-#speedInput::-webkit-outer-spin-button,
-#speedInput::-webkit-inner-spin-button,
-#toneInput::-webkit-outer-spin-button,
-#toneInput::-webkit-inner-spin-button {
+#speedRate::-webkit-outer-spin-button,
+#speedRate2::-webkit-inner-spin-button,
+#speechPitch::-webkit-outer-spin-button,
+#toneRate::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
