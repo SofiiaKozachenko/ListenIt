@@ -1,4 +1,201 @@
+class UiManager {
+    constructor(speechManager) {
+        this.speechManager = speechManager; // Залежність від SpeechManager для озвучення
+
+        this.speechRateInput = document.getElementById("speechRate");
+        this.speechRateSlider = document.getElementById("speechRate2");
+        this.speechPitchInput = document.getElementById("speechPitch");
+        this.speechPitchSlider = document.getElementById("toneRate");
+        this.closeButton = document.getElementById('cross');
+        this.init();
+    }
+
+    init() {
+        this.addEventListeners();
+        this.loadSettings();
+    }
+
+    // Функція для оновлення значення в числовому полі на основі слайдера
+    updateNumberInput(slider, numberInput) {
+        numberInput.value = slider.value;
+    }
+
+    // Функція для оновлення значення слайдера на основі числового поля
+    updateSlider(numberInput, slider) {
+        slider.value = numberInput.value;
+    }
+
+    addEventListeners() {
+        // Обробник події для слайдера швидкості озвучення
+        this.speechRateSlider.addEventListener("input", () => {
+            this.updateNumberInput(this.speechRateSlider, this.speechRateInput);
+            this.testVoice();
+        });
+
+        // Обробник події для зміни значення поля вводу швидкості
+        this.speechRateInput.addEventListener("change", () => {
+            this.updateSlider(this.speechRateInput, this.speechRateSlider);
+            this.testVoice();
+        });
+
+        // Обробник події для слайдера висоти тону
+        this.speechPitchSlider.addEventListener("input", () => {
+            this.updateNumberInput(this.speechPitchSlider, this.speechPitchInput);
+            this.testVoice();
+        });
+
+        // Обробник події для зміни значення поля вводу висоти тону
+        this.speechPitchInput.addEventListener("change", () => {
+            this.updateSlider(this.speechPitchInput, this.speechPitchSlider);
+            this.testVoice();
+        });
+
+        if (this.closeButton) {
+            this.closeButton.addEventListener('click', () => {
+                window.close();
+            });
+        }
+    }
+
+    loadSettings() {
+        chrome.storage.sync.get("settings", (data) => {
+            const settings = data.settings || {};
+
+            // Оновлюємо значення слайдерів і полів вводу згідно з налаштуваннями
+            this.speechRateInput.value = settings.speechRate || 1;
+            this.speechPitchInput.value = settings.speechPitch || 1;
+            this.speechRateSlider.value = settings.speechRate || 1;
+            this.speechPitchSlider.value = settings.speechPitch || 1;
+
+            // Тестове озвучення при завантаженні налаштувань
+            this.testVoice();
+        });
+    }
+
+    testVoice() {
+        const rate = parseFloat(this.speechRateInput.value) || 1;
+        const pitch = parseFloat(this.speechPitchInput.value) || 1;
+
+        this.speechManager.speak("Це тестовий текст для перевірки голосу.");
+        this.speechManager.currentUtterance.rate = rate;
+        this.speechManager.currentUtterance.pitch = pitch;
+    }
+}
+
+
+class SpeechManager {
+    constructor() {
+        this.speechSynthesis = window.speechSynthesis;
+        this.currentUtterance = null;
+        this.voices = [];
+        this.selectedVoice = null;
+
+        this.loadVoices();
+    }
+
+    loadVoices() {
+        this.voices = this.speechSynthesis.getVoices();
+        this.selectedVoice = this.voices[0];
+    }
+
+    speak(text) {
+        if (!text.trim()) {
+            console.error("Текст для озвучення порожній.");
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.voice = this.selectedVoice || this.voices[0];
+        utterance.lang = "uk-UA"; 
+        utterance.rate = 1; 
+        utterance.pitch = 1; 
+
+        this.speechSynthesis.speak(utterance);
+    }
+
+    stopSpeech() {
+        this.speechSynthesis.cancel();
+    }
+
+    getVoices() {
+        return this.voices;
+    }
+}
+
+class SettingManager {
+    constructor(uiManager, speechManager) {
+        this.uiManager = uiManager;
+        this.speechManager = speechManager;
+
+        // Завантажуємо налаштування при ініціалізації
+        this.loadSettings();
+    }
+
+    // Завантаження налаштувань із chrome.storage.sync
+    loadSettings() {
+        chrome.storage.sync.get("settings", (data) => {
+            const settings = data.settings || {};
+
+            // Завантажуємо налаштування для кожного параметра
+            this.updateVoice(settings.selectedVoice);
+            this.updateSpeechRate(settings.speechRate || 1);
+            this.updateSpeechPitch(settings.speechPitch || 1);
+            this.updateIgnoreAds(settings.ignoreAds || false);
+
+            // Оновлюємо інтерфейс
+            this.uiManager.loadSettings();
+        });
+    }
+
+    // Оновлення голосу
+    updateVoice(voiceName) {
+        const voices = this.speechManager.getVoices();
+        const selectedVoice = voices.find(voice => voice.name === voiceName);
+        if (selectedVoice) {
+            this.speechManager.setSelectedVoice(selectedVoice);
+        }
+    }
+
+    // Оновлення швидкості синтезу мови
+    updateSpeechRate(rate) {
+        this.speechManager.setVoiceSettings(rate, this.speechManager.currentPitch);
+    }
+
+    // Оновлення тембру синтезу мови
+    updateSpeechPitch(pitch) {
+        this.speechManager.setVoiceSettings(this.speechManager.currentRate, pitch);
+    }
+
+    // Оновлення налаштувань ігнорування реклами
+    updateIgnoreAds(ignoreAds) {
+        chrome.storage.sync.set({ "ignoreAds": ignoreAds }, () => {
+            console.log(`Ігнорування реклами: ${ignoreAds}`);
+        });
+    }
+
+    // Збереження налаштувань
+    saveSettings(settings) {
+        chrome.storage.sync.set({ settings }, () => {
+            console.log("Налаштування збережено:", settings);
+            alert("Налаштування збережено!");
+        });
+    }
+
+    // Оновлення налаштувань в UI
+    updateMode(mode) {
+        chrome.storage.sync.get("settings", (data) => {
+            const settings = data.settings || {};
+            settings.mode = mode;
+            this.saveSettings(settings);
+        });
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+    const uiManager = new UiManager();
+    const speechManager = new SpeechManager();
+    const settingManager = new SettingManager(uiManager, speechManager);
+
     const hoverModeButton = document.getElementById("hoverMode");
     const readPageModeButton = document.getElementById("readPageMode");
     const selectionModeButton = document.getElementById("selectionMode");
@@ -14,8 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedVoice = null;
     let voices = [];
 
-    document.getElementById('cross').addEventListener('click', () => window.close());
-
+    // Функція для заповнення списку голосів
     function populateVoices() {
         voices = speechSynthesis.getVoices(); 
         voiceList.innerHTML = "";
@@ -40,38 +236,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }       
 
-    function speak(text) {
-        if (!text) return;
-    
-        const utterance = new SpeechSynthesisUtterance(text);
-        const voices = speechSynthesis.getVoices();
-        
-        const selected = voices.find(voice => voice.name === selectedVoice);
-        utterance.voice = selected || voices[0];
-        
-        utterance.rate = 1;
-        utterance.pitch = 1; 
+    // Функція для тестування голосу
+    function testVoice() {
+        const utterance = new SpeechSynthesisUtterance("Це тестовий текст для перевірки голосу.");
+        utterance.voice = voices.find(voice => voice.name === selectedVoice) ?? null;
+        utterance.rate = parseFloat(speechRateInput.value) || 1;
+        utterance.pitch = parseFloat(speechPitchInput.value) || 1;
         speechSynthesis.speak(utterance);
     }
 
+    // Завантаження голосів після завантаження сторінки
     window.addEventListener('load', () => {
         populateVoices();
-    
+        settingManager.loadSettings();
+
         setTimeout(() => {
             console.log("Trying to speak...");
             const welcomeMessage = document.getElementById('welcomeMessage');
             const instructionsMessage = document.getElementById('instructionsMessage');
-    
+
             if (!instructionsMessage || !welcomeMessage) {
                 console.error("Element not found!");
                 return;
             }
-    
-            speak(welcomeMessage.innerText);
-            speak(instructionsMessage.innerText);
-        }, 1000); 
+
+            speechManager.speak(welcomeMessage.innerText);
+            speechManager.speak(instructionsMessage.innerText);
+        }, 1000);
     });
-    
 
     voiceBtn.addEventListener("click", () => {
         voiceList.classList.toggle("show");
@@ -85,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Завантаження налаштувань
     function loadSettings() {
         chrome.storage.sync.get("settings", (data) => {
             const settings = data.settings || {};
@@ -124,14 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function testVoice() {
-        const utterance = new SpeechSynthesisUtterance("Це тестовий текст для перевірки голосу.");
-        utterance.voice = voices.find(voice => voice.name === selectedVoice) ?? null;
-        utterance.rate = parseFloat(speechRateInput.value) || 1;
-        utterance.pitch = parseFloat(speechPitchInput.value) || 1;
-        speechSynthesis.speak(utterance);
-    }
-
+    // Збереження налаштувань
     saveSettingsButton?.addEventListener("click", () => {
         const activeButton = document.querySelector('.button-style.active');
         const mode = activeButton ? activeButton.id.replace('Mode', '') : 'tab';
@@ -165,36 +351,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Зупинка озвучення
     stopSpeechButton?.addEventListener("click", () => {
-        speechSynthesis.cancel();
-    });
-
-    function updateNumberInput(slider, numberInput) {
-        numberInput.value = slider.value;
-    }
-
-    function updateSlider(numberInput, slider) {
-        slider.value = numberInput.value;
-    }
-
-    speechRateSlider.addEventListener("input", () => {
-        updateNumberInput(speechRateSlider, speechRateInput);
-        testVoice();
-    });
-
-    speechRateInput.addEventListener("change", () => {
-        updateSlider(speechRateInput, speechRateSlider);
-        testVoice();
-    });
-
-    speechPitchSlider.addEventListener("input", () => {
-        updateNumberInput(speechPitchSlider, speechPitchInput);
-        testVoice();
-    });
-
-    speechPitchInput.addEventListener("change", () => {
-        updateSlider(speechPitchInput, speechPitchSlider);
-        testVoice();
+        speechManager.stopSpeech();
     });
 
     function updateMode(mode) {
@@ -220,19 +379,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById("hoverMode").addEventListener("focus", () => {
-        speak("Режим читання наведенням мишки");
+        speechManager.speak("Режим читання наведенням мишки");
     });
     
     document.getElementById("readPageMode").addEventListener("focus", () => {
-        speak("Режим читання всього тексту");
+        speechManager.speak("Режим читання всього тексту");
     });
     
     document.getElementById("selectionMode").addEventListener("focus", () => {
-        speak("Режим читання виділеного тексту");
+        speechManager.speak("Режим читання виділеного тексту");
     });
 
     document.getElementById("stopSpeech").addEventListener("focus", () => {
-        speak("Кнопка для зупинки озвучення");
+        speechManager.speak("Кнопка для зупинки озвучення");
     });
 
     loadSettings();
