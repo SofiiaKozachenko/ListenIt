@@ -58,7 +58,6 @@ class UiManager {
             this.speechPitchInput.value = settings.speechPitch || 1;
             this.speechRateSlider.value = settings.speechRate || 1;
             this.speechPitchSlider.value = settings.speechPitch || 1;
-            this.testVoice();
         });
     }
 
@@ -181,7 +180,6 @@ class SettingManager {
 
 }
 
-
 class ModeManager {
     constructor(speechManager) {
         this.speechManager = speechManager;
@@ -267,14 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (voices.length > 0 && !selectedVoice) {
             selectedVoice = voices[0].name;
         }
-    }
-
-    function testVoice() {
-        const utterance = new SpeechSynthesisUtterance("Це тестовий текст для перевірки голосу.");
-        utterance.voice = voices.find(voice => voice.name === selectedVoice) ?? null;
-        utterance.rate = parseFloat(uiManager.speechRateInput.value) || 1;
-        utterance.pitch = parseFloat(uiManager.speechPitchInput.value) || 1;
-        speechSynthesis.speak(utterance);
     }
 
     window.addEventListener('load', () => {
