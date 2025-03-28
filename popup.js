@@ -1,8 +1,7 @@
-
 class UiManager {
     constructor(speechManager) {
         this.speechManager = speechManager;
-      
+
         this.speechRateInput = document.getElementById("speechRate");
         this.speechRateSlider = document.getElementById("speechRate2");
         this.speechPitchInput = document.getElementById("speechPitch");
@@ -64,10 +63,12 @@ class UiManager {
     }
 
     testVoice() {
-        chrome.storage.sync.get("settings", (data) => {
-    
-            this.speechManager.speak("Це тестовий текст для перевірки голосу.");
-        });
+        const rate = parseFloat(this.speechRateInput.value) || 1;
+        const pitch = parseFloat(this.speechPitchInput.value) || 1;
+        this.speechManager.speak("Це тестовий текст для перевірки голосу.");
+        this.rate = rate;
+        this.pitch = pitch;
+
     }
 }
 
@@ -160,34 +161,31 @@ class SettingManager {
         });
     }
 
-   saveSettings(newSettings) {
-    chrome.storage.sync.get("settings", (data) => {
-        const currentSettings = data.settings || {};
-        
-        // Оновлюємо лише ті параметри, що змінюються
-        const updatedSettings = { 
-            ...currentSettings, 
-            ...newSettings,
-            mode: currentSettings.mode || "default"  // НЕ перезаписуємо mode
-        };
+    saveSettings(newSettings) {
+        chrome.storage.sync.get("settings", (data) => {
+            const currentSettings = data.settings || {};
 
-        chrome.storage.sync.set({ settings: updatedSettings }, () => {
-            console.log("Збережені налаштування:", updatedSettings);
-            alert("Налаштування збережено!");
+            // Оновлюємо лише ті параметри, що змінюються
+            const updatedSettings = {
+                ...currentSettings,
+                ...newSettings,
+                mode: currentSettings.mode || "default"  // НЕ перезаписуємо mode
+            };
+
+            chrome.storage.sync.set({ settings: updatedSettings }, () => {
+                console.log("Збережені налаштування:", updatedSettings);
+                alert("Налаштування збережено!");
+            });
         });
-    });
-}
+    }
 
 }
-
-
-
 
 
 class ModeManager {
     constructor(speechManager) {
         this.speechManager = speechManager;
-        
+
         this.mode = 'tab';
     }
 
@@ -211,25 +209,28 @@ class ModeManager {
     }
 
     applyMode() {
-    chrome.storage.sync.get("settings", (data) => {
-        const settings = data.settings || {};
-        settings.mode = this.mode; // Оновлюємо тільки режим
+        chrome.storage.sync.get("settings", (data) => {
+            const settings = data.settings || {};
+            settings.mode = this.mode; // Оновлюємо тільки режим
 
-        chrome.storage.sync.set({ settings }, () => {
-            console.log(`Режим змінено на: ${this.mode}`);
-            
+            chrome.storage.sync.set({ settings }, () => {
+                console.log(`Режим змінено на: ${this.mode}`);
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs && tabs.length > 0) {
+                        chrome.tabs.reload(tabs[0].id);
+                    }
+                });
+            });
         });
-    });
-}
+    }
 
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const speechManager = new SpeechManager();
-   
-    
-    const settingManager = new SettingManager(uiManager, speechManager);
+
     const uiManager = new UiManager(speechManager);
+    const settingManager = new SettingManager(uiManager, speechManager);
     const modeManager = new ModeManager(speechManager);
 
     const hoverModeButton = document.getElementById("hoverMode");
@@ -251,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         voices.forEach(voice => {
             const voiceItem = document.createElement("div");
-            voiceItem.innerHTML = `<span class="math-inline">${voice.name} (${voice.lang})</span>`;
+            voiceItem.innerHTML = `${voice.name} (${voice.lang})`;
 
             voiceItem.classList.add("dropdown-item");
             voiceItem.addEventListener("click", () => {
@@ -368,21 +369,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-       setTimeout(() => window.close(), 100); // Додаємо невелику затримку для стабільності
+        loadSettings();
+        saveSettingsButton?.addEventListener("click", () => {
+            // Отримуємо ID поточного вікна розширення та закриваємо його
+            chrome.windows.getCurrent((window) => {
+                if (window && window.id) {
+                    chrome.windows.remove(window.id);
+                }
+            });
+        });
 
-// Перезавантажуємо активну вкладку без згортання браузера
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs.length > 0) {
-        chrome.tabs.reload(tabs[0].id);
-    }
-});
-     
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs && tabs.length > 0) {
+                chrome.tabs.reload(tabs[0].id);
+            }
+        });
     });
 
     stopSpeechButton?.addEventListener("click", () => {
         speechManager.stopSpeech();
     });
-
 
 
     document.getElementById("hoverMode").addEventListener("click", () => {
@@ -414,5 +420,4 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     });
 
     loadSettings();
-    
 });
