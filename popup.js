@@ -5,6 +5,37 @@ import ModeManager from "./js/ModeManager.js";
 import TextExtractor from "./js/TextExtractor.js";
 import ContentObserver from "./js/ContentObserver.js";
 
+function observeMutations(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList' || mutation.type === 'subtree') {
+        // Handle the mutation, such as removing ads or reading content
+        removeAds();
+        readPageContent();
+        break; // Stop after handling the first mutation
+      }
+    }
+  }
+  
+  // Example function to remove ads
+  function removeAds() {
+    const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
+    adSelectors.forEach(selector => {
+      document.querySelectorAll(selector).forEach(ad => ad.remove());
+    });
+  }
+  
+  // Example function to read page content
+  function readPageContent() {
+    const pageText = document.body.innerText.trim();
+    if (pageText) {
+      console.log("Reading page content:", pageText); // Replace with actual speechManager.speak() if needed
+    }
+  }
+  
+  // Use MutationObserver to observe changes in the DOM
+  const observer = new MutationObserver(observeMutations);
+  observer.observe(document.body, { childList: true, subtree: true });
+
 document.addEventListener("DOMContentLoaded", () => {
     const textExtractor = new TextExtractor();
     const speechManager = new SpeechManager();

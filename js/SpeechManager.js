@@ -71,3 +71,5 @@ export default class SpeechManager {
         this.selectedVoice.pitch = pitch;
     }
 }
+
+window.SpeechManager = SpeechManager;

@@ -94,4 +94,5 @@ export default class ModeManager {
       }
     }
   }
-  
+
+  window.ModeManager = ModeManager;

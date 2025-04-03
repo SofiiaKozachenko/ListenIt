@@ -56,3 +56,5 @@ export default class SettingManager {
         });
     }
 }
+
+window.SettingManager = SettingManager;
