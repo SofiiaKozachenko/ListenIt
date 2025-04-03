@@ -1,4 +1,4 @@
-export class TextExtractor {
+export default class TextExtractor {
     getPageText() {
       return document.body.innerText.trim();
     }

@@ -17,6 +17,10 @@ export default class UiManager {
     }
 
     init() {
+        if (!this.modeManager) {
+            console.error("modeManager is not defined");
+            return;
+        }
         this.addEventListeners();
         this.loadSettings();
     }

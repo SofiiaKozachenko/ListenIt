@@ -1,10 +1,20 @@
-import { TextExtractor } from "./js/TextExtractor";
-import { ContentObserver } from "./js/ContentObserver";
-import ModeManager from "./js/ModeManager";
-import SpeechManager from "./js/SpeechManager";
+import TextExtractor from "./js/TextExtractor.js";
+import ContentObserver from "./js/ContentObserver.js";
+import ModeManager from "./js/ModeManager.js";
+import SpeechManager from "./js/SpeechManager.js";
 
 let settings = {};
 let userInteracted = false;
+
+function observeMutations(mutationsList, observer) {
+  for (const mutation of mutationsList) {
+    if (mutation.type === 'childList' || mutation.type === 'subtree') {
+      removeAds();
+      readPageContent(); 
+      break;
+    }
+  }
+}
 
 const textExtractor = new TextExtractor();
 const speechManager = new SpeechManager();

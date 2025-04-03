@@ -84,6 +84,10 @@ export default class ModeManager {
     }
   
     handleTextSelection() {
+      if (!this.textExtractor) {
+        console.error("textExtractor is undefined");
+        return;
+      }
       const selectedText = this.textExtractor.getSelectedText();
       if (selectedText) {
         this.speechManager.speak(selectedText);

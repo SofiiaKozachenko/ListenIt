@@ -1,4 +1,4 @@
-export class ContentObserver {
+export default class ContentObserver {
     constructor(callback) {
       this.observer = new MutationObserver(callback);
     }

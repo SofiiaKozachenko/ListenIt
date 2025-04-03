@@ -2,11 +2,15 @@ import UiManager from "./js/UiManager.js";
 import SettingManager from "./js/SettingManager.js";
 import SpeechManager from "./js/SpeechManager.js";
 import ModeManager from "./js/ModeManager.js";
+import TextExtractor from "./js/TextExtractor.js";
+import ContentObserver from "./js/ContentObserver.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    const textExtractor = new TextExtractor();
     const speechManager = new SpeechManager();
-    const modeManager = new ModeManager();
-    const uiManager = new UiManager(speechManager);
+    const contentObserver = new ContentObserver(observeMutations);
+    const modeManager = new ModeManager(speechManager, textExtractor, contentObserver);
+    const uiManager = new UiManager(speechManager, modeManager);
     const settingManager = new SettingManager(uiManager, speechManager);
     uiManager.loadSettings();
 
@@ -36,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 voiceBtn.textContent = `${voice.name} (${voice.lang})`;
                 selectedVoice = voice.name;
                 voiceList.classList.remove("show");
-                uiManager.testVoice();
+                speechManager.testVoice();
             });
             voiceList.appendChild(voiceItem);
         });
@@ -139,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     
         loadSettings();
-        window.close();
+        //window.close();
         
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs && tabs.length > 0) {
