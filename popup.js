@@ -1,9 +1,7 @@
 import UiManager from "./js/UiManager.js";
-import SettingManager from "./js/SettingManager.js";
 import SpeechManager from "./js/SpeechManager.js";
+import SettingManager from "./js/SettingManager.js";
 import ModeManager from "./js/ModeManager.js";
-import TextExtractor from "./js/TextExtractor.js";
-import ContentObserver from "./js/ContentObserver.js";
 
 function observeMutations(mutationsList, observer) {
     for (const mutation of mutationsList) {
@@ -37,10 +35,8 @@ function observeMutations(mutationsList, observer) {
   observer.observe(document.body, { childList: true, subtree: true });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const textExtractor = new TextExtractor();
     const speechManager = new SpeechManager();
-    const contentObserver = new ContentObserver(observeMutations);
-    const modeManager = new ModeManager(speechManager, textExtractor, contentObserver);
+    const modeManager = new ModeManager(speechManager);
     const uiManager = new UiManager(speechManager, modeManager);
     const settingManager = new SettingManager(uiManager, speechManager);
     uiManager.loadSettings();

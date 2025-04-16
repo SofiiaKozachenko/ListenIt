@@ -15,7 +15,10 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": [
+        "js/SpeechManager.js",
+        "content.js"
+      ]
     }
   ],
   
