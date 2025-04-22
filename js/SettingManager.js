@@ -9,13 +9,38 @@ export default class SettingManager {
     loadSettings() {
         chrome.storage.sync.get("settings", (data) => {
             const settings = data.settings || {};
-            this.updateVoice(settings.selectedVoice);
-            this.updateSpeechRate(settings.speechRate || 1);
-            this.updateSpeechPitch(settings.speechPitch || 1);
-            this.updateIgnoreAds(settings.ignoreAds || false);
-            this.uiManager.loadSettings();
+
+            // Перевіряємо чи передано якісь значення, інакше залишаємо попередні
+            if (settings.selectedVoice) {
+                this.updateVoice(settings.selectedVoice);
+            }
+            if (settings.speechRate !== undefined) {
+                this.updateSpeechRate(settings.speechRate);
+            }
+            if (settings.speechPitch !== undefined) {
+                this.updateSpeechPitch(settings.speechPitch);
+            }
+            if (settings.ignoreAds !== undefined) {
+                this.updateIgnoreAds(settings.ignoreAds);
+            }
+
+            // Додай цю перевірку, щоб не збивати `mode`
+            if (settings.mode) {
+                chrome.storage.local.set({ currentMode: settings.mode }); // (для debug або можливого відображення)
+            }
+
+            this.uiManager.loadSettings(); // вже підтягує потрібні UI елементи
         });
     }
+
+
+    updateMode(mode) {
+        // Передаємо в modeManager (якщо потрібно)
+        if (this.uiManager?.modeManager?.setMode) {
+            this.uiManager.modeManager.setMode(mode);
+        }
+    }
+
 
     updateVoice(voiceName) {
         const voices = this.speechManager.getVoices();
@@ -34,27 +59,43 @@ export default class SettingManager {
     }
 
     updateIgnoreAds(ignoreAds) {
-        chrome.storage.sync.set({ "ignoreAds": ignoreAds }, () => {
-            console.log(`Ігнорування реклами: ${ignoreAds}`);
-        });
-    }
-
-    saveSettings(newSettings) {
         chrome.storage.sync.get("settings", (data) => {
             const currentSettings = data.settings || {};
-
             const updatedSettings = {
                 ...currentSettings,
-                ...newSettings,
-                mode: currentSettings.mode || "default" 
+                ignoreAds: ignoreAds
             };
 
             chrome.storage.sync.set({ settings: updatedSettings }, () => {
-                console.log("Збережені налаштування:", updatedSettings);
-                alert("Налаштування збережено!");
+
+                chrome.storage.sync.get("settings", (newData) => {
+
+                });
             });
         });
     }
+
+
+
+
+    saveSettings(newSettings) {
+        return new Promise((resolve) => {
+            chrome.storage.sync.get("settings", (data) => {
+                const currentSettings = data.settings || {};
+                const updatedSettings = {
+                    ...currentSettings,
+                    ...newSettings
+                };
+                chrome.storage.sync.set({ settings: updatedSettings }, () => {
+                    console.log("✅ Збережено налаштування:", updatedSettings);
+                    resolve(updatedSettings);
+                });
+            });
+        });
+    }
+
+
+
 }
 
 window.SettingManager = SettingManager;

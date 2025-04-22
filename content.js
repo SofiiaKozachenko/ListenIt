@@ -38,6 +38,7 @@ const textExtractor = new TextExtractor();
 const contentObserver = new ContentObserver(observeMutations);
 const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
 
+
 function isAd(element) {
   return adSelectors.some(selector => element.closest(selector));
 }
@@ -204,6 +205,8 @@ function speakParagraphs(paragraphs, index) {
 }
 
 function removeAds() {
+  if (!settings.ignoreAds) return; // якщо режим вимкнено, не прибираємо рекламу
+
   adSelectors.forEach(selector => {
     document.querySelectorAll(selector).forEach(ad => ad.remove());
   });

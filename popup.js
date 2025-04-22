@@ -147,10 +147,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    saveSettingsButton?.addEventListener("click", () => {
+    saveSettingsButton?.addEventListener("click", async () => {
         const activeButton = document.querySelector('.button-style.active');
-        const mode = activeButton ? activeButton.id.replace('Mode', '') : 'tab';
-    
+        const mode = activeButton ? activeButton.id.replace('Mode', '') : 'tab'; // Або інше значення за замовчуванням
+
         const settings = {
             mode: mode,
             ignoreAds: ignoreAdsCheckbox?.checked ?? false,
@@ -158,26 +158,24 @@ document.addEventListener("DOMContentLoaded", () => {
             speechRate: parseFloat(uiManager.speechRateInput?.value) || 1,
             speechPitch: parseFloat(uiManager.speechPitchInput?.value) || 1,
         };
-    
-        settingManager.saveSettings(settings);
-    
-        document.querySelectorAll('.button-style').forEach(button => {
-            if (button.id.replace('Mode', '') === settings.mode) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-    
-        loadSettings();
-        //window.close();
-        
+
+        const updated = await settingManager.saveSettings(settings);
+        console.log("Налаштування збережено і повернуто:", updated);
+
+        loadSettings(); // тепер гарантовано оновиться після збереження
+
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs && tabs.length > 0) {
                 chrome.tabs.reload(tabs[0].id);
             }
         });
-    });    
+    });
+
+    ignoreAdsCheckbox.addEventListener("change", () => {
+        const checked = ignoreAdsCheckbox.checked;
+        settingManager.updateIgnoreAds(checked);
+    });
+
 
     stopSpeechButton?.addEventListener("click", () => {
         speechManager.stopSpeech();
