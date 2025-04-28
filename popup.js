@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    saveSettingsButton?.addEventListener("click", async () => {
+    saveSettingsButton?.addEventListener("click", () => {
         const activeButton = document.querySelector('.button-style.active');
         const mode = activeButton ? activeButton.id.replace('Mode', '') : 'tab'; // Або інше значення за замовчуванням
 
@@ -159,8 +159,15 @@ document.addEventListener("DOMContentLoaded", () => {
             speechPitch: parseFloat(uiManager.speechPitchInput?.value) || 1,
         };
 
-        const updated = await settingManager.saveSettings(settings);
-        console.log("Налаштування збережено і повернуто:", updated);
+        settingManager.saveSettings(settings);
+    
+        document.querySelectorAll('.button-style').forEach(button => {
+            if (button.id.replace('Mode', '') === settings.mode) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
 
         loadSettings(); // тепер гарантовано оновиться після збереження
 

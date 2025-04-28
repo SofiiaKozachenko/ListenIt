@@ -33,14 +33,12 @@ export default class SettingManager {
         });
     }
 
-
     updateMode(mode) {
         // Передаємо в modeManager (якщо потрібно)
         if (this.uiManager?.modeManager?.setMode) {
             this.uiManager.modeManager.setMode(mode);
         }
     }
-
 
     updateVoice(voiceName) {
         const voices = this.speechManager.getVoices();
@@ -63,21 +61,16 @@ export default class SettingManager {
             const currentSettings = data.settings || {};
             const updatedSettings = {
                 ...currentSettings,
-                ignoreAds: ignoreAds
+                ignoreAds: ignoreAds, // Correctly update ignoreAds here
+                mode: currentSettings.mode || "default"
             };
-
+    
             chrome.storage.sync.set({ settings: updatedSettings }, () => {
-
-                chrome.storage.sync.get("settings", (newData) => {
-
-                });
+                console.log("Updated settings:", updatedSettings);
             });
         });
     }
-
-
-
-
+    
     saveSettings(newSettings) {
         return new Promise((resolve) => {
             chrome.storage.sync.get("settings", (data) => {

@@ -205,9 +205,28 @@ function speakParagraphs(paragraphs, index) {
 }
 
 function removeAds() {
-  if (!settings.ignoreAds) return; // якщо режим вимкнено, не прибираємо рекламу
+  if (!settings.ignoreAds) return;
 
   adSelectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(ad => ad.remove());
+      document.querySelectorAll(selector).forEach(ad => ad.remove());
   });
+
+  readPageContent();
 }
+
+function observeAndHandleAds() {
+  const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
+  const elements = document.querySelectorAll(adSelectors.join(", "));
+  elements.forEach(element => {
+      element.remove(); // Видаляємо елементи реклами
+  });
+
+  // Після видалення реклами зчитуємо текст сторінки
+  readPageContent();
+}
+
+contentObserver = new MutationObserver(() => {
+  observeAndHandleAds();  // Спостерігаємо за змінами і одразу видаляємо рекламу
+});
+
+contentObserver.observe(document.body, { childList: true, subtree: true });
