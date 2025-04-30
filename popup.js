@@ -178,11 +178,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    window.addEventListener("load", () => {
+        chrome.storage.sync.get("settings", (data) => {
+            const settings = data.settings || {};
+    
+            // Відновлюємо режим і налаштування
+            if (settings.mode) {
+                document.querySelector(`#${settings.mode}Mode`).classList.add('active');
+            }
+    
+            // Інші налаштування
+            ignoreAdsCheckbox.checked = settings.ignoreAds || false;
+            selectedVoice = settings.selectedVoice || null;
+            uiManager.speechRateInput.value = settings.speechRate || 1;
+            uiManager.speechPitchInput.value = settings.speechPitch || 1;
+    
+            // Завантажуємо голоси
+            if (speechSynthesis.getVoices().length > 0) {
+                populateVoices();
+            } else {
+                speechSynthesis.onvoiceschanged = () => {
+                    populateVoices();
+                };
+            }
+        });
+    });
+
     ignoreAdsCheckbox.addEventListener("change", () => {
         const checked = ignoreAdsCheckbox.checked;
         settingManager.updateIgnoreAds(checked);
     });
-
 
     stopSpeechButton?.addEventListener("click", () => {
         speechManager.stopSpeech();
