@@ -36,12 +36,23 @@ class ContentObserver {
 
 const textExtractor = new TextExtractor();
 const contentObserver = new ContentObserver(observeMutations);
-const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
+const adSelectors = [
+  ".ad", ".ads", ".adsbox", ".ad-banner", ".ad-container", ".sponsor",
+  "[id*='ad']", "[id*='ads']", "[id*='banner']", "[id*='sponsor']",
+  "[class*='ad']", "[class*='ads']", "[class*='sponsor']", "[class*='promo']",
+  "iframe[src*='ads']", "iframe[src*='doubleclick']", "iframe[src*='googlesyndication']",
+  "script[src*='ads']", "div[data-ad]", "[data-ad]", "[data-ad-id]", "[data-testid*='ad']"
+];
 
 
 function isAd(element) {
-  return adSelectors.some(selector => element.closest(selector));
+  if (!element) return false;
+
+  return adSelectors.some(selector =>
+    element.matches(selector) || element.closest(selector)
+  );
 }
+
 
 function loadVoices() {
   voices = speechSynthesis.getVoices();
@@ -54,22 +65,36 @@ function loadVoices() {
 
 function handleMouseOver(event) {
   const target = event.target;
+
+  // Проверка на рекламу
+  if (settings.ignoreAds && isAd(target)) return;
+
   const text = textExtractor.getTextFromPageElement(target);
   if (text && text.length <= 1500) {
     speak(text);
   }
 }
 
+
 function handleTabFocus(event) {
   const target = event.target;
+
+  if (settings.ignoreAds && isAd(target)) return;
+
   const text = textExtractor.getTextFromPageElement(target);
   if (text) {
     speak(text);
   }
 }
 
+
 function handleTextSelection() {
-  const selectedText = textExtractor.getSelectedText();
+  const selection = window.getSelection();
+  const selectedText = selection.toString().trim();
+  const anchorNode = selection.anchorNode?.parentElement;
+
+  if (settings.ignoreAds && isAd(anchorNode)) return;
+
   if (selectedText) {
     speak(selectedText);
   }
@@ -225,8 +250,9 @@ function observeAndHandleAds() {
   readPageContent();
 }
 
-contentObserver = new MutationObserver(() => {
-  observeAndHandleAds();  // Спостерігаємо за змінами і одразу видаляємо рекламу
-});
 
-contentObserver.observe(document.body, { childList: true, subtree: true });
+const adObserver = new ContentObserver(() => {
+  observeAndHandleAds();
+});
+adObserver.observeChanges(document.body);
+;
