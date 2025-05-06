@@ -1,83 +1,192 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const hoverModeCheckbox = document.getElementById("hoverMode");
-  const autoDetectLanguageCheckbox = document.getElementById("autoDetectLanguage");
-  const voiceSelect = document.getElementById("voiceSelect");
-  const speechRateInput = document.getElementById("speechRate");
-  const saveSettingsButton = document.getElementById("saveSettings");
-  const stopSpeechButton = document.getElementById("stopSpeech");
+import UiManager from "./js/UiManager.js";
+import SpeechManager from "./js/SpeechManager.js";
+import SettingManager from "./js/SettingManager.js";
+import ModeManager from "./js/ModeManager.js";
 
-  // Завантаження голосів
-  function populateVoices() {
-    const voices = speechSynthesis.getVoices();
-    voiceSelect.innerHTML = voices
-      .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
-      .join("");
-  }
-
-  // Завантаження збережених налаштувань
-  function loadSettings() {
-    chrome.storage.sync.get("settings", (data) => {
-      const settings = data.settings || {};
-
-      // Встановлення значень у UI
-      hoverModeCheckbox.checked = settings.hoverMode || false;
-      autoDetectLanguageCheckbox.checked = settings.autoDetectLanguage || false;
-      speechRateInput.value = settings.speechRate || 1;
-
-      // Встановлення обраного голосу
-      const voices = speechSynthesis.getVoices();
-      if (settings.selectedVoice) {
-        const selectedVoice = voices.find(voice => voice.name === settings.selectedVoice);
-        if (selectedVoice) {
-          voiceSelect.value = selectedVoice.name;
-        }
+function observeMutations(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList' || mutation.type === 'subtree') {
+        // Handle the mutation, such as removing ads or reading content
+        removeAds();
+        readPageContent();
+        break; // Stop after handling the first mutation
       }
+    }
+  }
+  
+  // Example function to remove ads
+  function removeAds() {
+    const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
+    adSelectors.forEach(selector => {
+      document.querySelectorAll(selector).forEach(ad => ad.remove());
     });
   }
-
-  // Озвучення тестового тексту при зміні голосу
-  function testVoice() {
-    const selectedVoiceName = voiceSelect.value;
-    const testText = "Це тестовий текст для перевірки голосу.";
-    const utterance = new SpeechSynthesisUtterance(testText);
-
-    const voices = speechSynthesis.getVoices();
-    const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+  
+  // Example function to read page content
+  function readPageContent() {
+    const pageText = document.body.innerText.trim();
+    if (pageText) {
+      console.log("Reading page content:", pageText); // Replace with actual speechManager.speak() if needed
     }
-    utterance.rate = parseFloat(speechRateInput.value) || 1;
-
-    speechSynthesis.speak(utterance);
   }
+  
+  // Use MutationObserver to observe changes in the DOM
+  const observer = new MutationObserver(observeMutations);
+  observer.observe(document.body, { childList: true, subtree: true });
 
-  // Зупинка озвучення
-  stopSpeechButton.addEventListener("click", () => {
-    speechSynthesis.cancel(); // Зупиняє всі поточні озвучення
-  });
+document.addEventListener("DOMContentLoaded", () => {
+    const speechManager = new SpeechManager();
+    const modeManager = new ModeManager(speechManager);
+    const uiManager = new UiManager(speechManager, modeManager);
+    const settingManager = new SettingManager(uiManager, speechManager);
+    uiManager.loadSettings();
 
-  // Збереження налаштувань
-  saveSettingsButton.addEventListener("click", () => {
+    const hoverModeButton = document.getElementById("hoverMode");
+    const readPageModeButton = document.getElementById("readPageMode");
+    const selectionModeButton = document.getElementById("selectionMode");
+    const ignoreAdsCheckbox = document.getElementById("ignoreAds");
+    const voiceBtn = document.getElementById("voice-btn");
+    const voiceList = document.getElementById("voice-list");
+    const saveSettingsButton = document.getElementById("saveSettings");
+    const stopSpeechButton = document.getElementById("stopSpeech");
+
+    let selectedVoice = null;
+    let voices = [];
+
+    function populateVoices() {
+        voices = speechSynthesis.getVoices();
+        voiceList.innerHTML = "";
+        voiceBtn.textContent = "Оберіть голос";
+
+        voices.forEach(voice => {
+            const voiceItem = document.createElement("div");
+            voiceItem.innerHTML = `${voice.name} (${voice.lang})`;
+
+            voiceItem.classList.add("dropdown-item");
+            voiceItem.addEventListener("click", () => {
+                voiceBtn.textContent = `${voice.name} (${voice.lang})`;
+                selectedVoice = voice.name;
+                voiceList.classList.remove("show");
+                speechManager.testVoice();
+            });
+            voiceList.appendChild(voiceItem);
+        });
+
+        if (voices.length > 0 && !selectedVoice) {
+            selectedVoice = voices[0].name;
+        }
+    }
+
+    window.addEventListener('load', () => {
+        populateVoices();
+        settingManager.loadSettings();
+
+        setTimeout(() => {
+            console.log("Trying to speak...");
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const instructionsMessage = document.getElementById('instructionsMessage');
+
+            if (!instructionsMessage || !welcomeMessage) {
+                console.error("Element not found!");
+                return;
+            }
+
+            speechManager.speak(welcomeMessage.innerText);
+            speechManager.speak(instructionsMessage.innerText);
+        }, 1000);
+    });
+
+    voiceBtn.addEventListener("click", () => {
+        voiceList.classList.toggle("show");
+    });
+
+    window.addEventListener("click", (event) => {
+        if (!event.target.matches(".dropdown-btn")) {
+            if (voiceList.classList.contains("show")) {
+                voiceList.classList.remove("show");
+            }
+        }
+    });
+
+    function loadSettings() {
+        chrome.storage.sync.get("settings", (data) => {
+            const settings = data.settings || {};
+
+            if (settings.mode === 'hoverMode') {
+                hoverModeButton.classList.add('active');
+                readPageModeButton.classList.remove('active');
+                selectionModeButton.classList.remove('active');
+            } else if (settings.mode === 'readPageMode') {
+                readPageModeButton.classList.add('active');
+                hoverModeButton.classList.remove('active');
+                selectionModeButton.classList.remove('active');
+            } else if (settings.mode === 'selectionMode') {
+                selectionModeButton.classList.add('active');
+                hoverModeButton.classList.remove('active');
+                readPageModeButton.classList.remove('active');
+            } else {
+                hoverModeButton.classList.remove('active');
+                readPageModeButton.classList.remove('active');
+                selectionModeButton.classList.remove('active');
+            }
+
+            ignoreAdsCheckbox.checked = settings.ignoreAds || false;
+            uiManager.speechRateInput.value = settings.speechRate || 1;
+            uiManager.speechPitchInput.value = settings.speechPitch || 1;
+            uiManager.speechRateSlider.value = settings.speechRate || 1;
+            uiManager.speechPitchSlider.value = settings.speechPitch || 1;
+            selectedVoice = settings.selectedVoice || null;
+
+            if (speechSynthesis.getVoices().length > 0) {
+                populateVoices();
+            } else {
+                speechSynthesis.onvoiceschanged = () => {
+                    populateVoices();
+                };
+            }
+        });
+    }
+
+    saveSettingsButton?.addEventListener("click", () => {
+    // Зберігаємо активний режим
+    const activeButton = document.querySelector('.button-style.active');
+    const mode = activeButton ? activeButton.id.replace('Mode', '') : 'hover'; // Якщо нічого не вибрано, зберігаємо 'hover'
+
     const settings = {
-      hoverMode: hoverModeCheckbox.checked,
-      autoDetectLanguage: autoDetectLanguageCheckbox.checked,
-      selectedVoice: voiceSelect.value,
-      speechRate: parseFloat(speechRateInput.value),
+        mode: mode, // зберігаємо поточний режим
+        ignoreAds: ignoreAdsCheckbox?.checked ?? false,
+        selectedVoice: selectedVoice,
+        speechRate: parseFloat(uiManager.speechRateInput?.value) || 1,
+        speechPitch: parseFloat(uiManager.speechPitchInput?.value) || 1,
     };
 
     chrome.storage.sync.set({ settings }, () => {
-      alert("Налаштування збережено!");
+        // Оновлюємо інтерфейс після збереження
+        document.querySelectorAll('.button-style').forEach(button => {
+            if (button.id.replace('Mode', '') === settings.mode) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+
+        // Повторно зчитуємо налаштування
+        loadSettings();
+
+        // Перезавантажуємо вкладку
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs && tabs.length > 0) {
+                chrome.tabs.reload(tabs[0].id);
+            }
+        });
     });
-  });
-
-  // Прив'язка події зміни голосу
-  voiceSelect.addEventListener("change", testVoice);
-
-  // Завантаження голосів при ініціалізації
-  populateVoices();
-  speechSynthesis.onvoiceschanged = populateVoices;
-
-  // Завантаження налаштувань при відкритті popup
-  loadSettings();
 });
 
+
+
+    stopSpeechButton?.addEventListener("click", () => {
+        speechManager.stopSpeech();
+    });
+
+    loadSettings();
+});
