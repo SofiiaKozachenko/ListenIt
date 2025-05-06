@@ -148,19 +148,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     saveSettingsButton?.addEventListener("click", () => {
-        const activeButton = document.querySelector('.button-style.active');
-        const mode = activeButton ? activeButton.id.replace('Mode', '') : 'tab';
-    
-        const settings = {
-            mode: mode,
-            ignoreAds: ignoreAdsCheckbox?.checked ?? false,
-            selectedVoice: selectedVoice,
-            speechRate: parseFloat(uiManager.speechRateInput?.value) || 1,
-            speechPitch: parseFloat(uiManager.speechPitchInput?.value) || 1,
-        };
-    
-        settingManager.saveSettings(settings);
-    
+    // Зберігаємо активний режим
+    const activeButton = document.querySelector('.button-style.active');
+    const mode = activeButton ? activeButton.id.replace('Mode', '') : 'hover'; // Якщо нічого не вибрано, зберігаємо 'hover'
+
+    const settings = {
+        mode: mode, // зберігаємо поточний режим
+        ignoreAds: ignoreAdsCheckbox?.checked ?? false,
+        selectedVoice: selectedVoice,
+        speechRate: parseFloat(uiManager.speechRateInput?.value) || 1,
+        speechPitch: parseFloat(uiManager.speechPitchInput?.value) || 1,
+    };
+
+    chrome.storage.sync.set({ settings }, () => {
+        // Оновлюємо інтерфейс після збереження
         document.querySelectorAll('.button-style').forEach(button => {
             if (button.id.replace('Mode', '') === settings.mode) {
                 button.classList.add('active');
@@ -168,16 +169,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 button.classList.remove('active');
             }
         });
-    
+
+        // Повторно зчитуємо налаштування
         loadSettings();
-        //window.close();
-        
+
+        // Перезавантажуємо вкладку
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs && tabs.length > 0) {
                 chrome.tabs.reload(tabs[0].id);
             }
         });
-    });    
+    });
+});
+
+
 
     stopSpeechButton?.addEventListener("click", () => {
         speechManager.stopSpeech();
