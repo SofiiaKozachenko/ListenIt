@@ -1,5 +1,5 @@
-//export default class UiManager {
-class UiManager {
+export default class UiManager {
+//class UiManager {
     constructor(speechManager, modeManager) {
         this.speechManager = speechManager;
         this.modeManager = modeManager;
@@ -108,4 +108,5 @@ class UiManager {
     }
 }
 
-module.exports = UiManager;
+window.UiManager = UiManager;
+//module.exports = UiManager;

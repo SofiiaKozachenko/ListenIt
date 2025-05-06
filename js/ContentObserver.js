@@ -1,5 +1,5 @@
-//export default class ContentObserver {
-  class ContentObserver {
+export default class ContentObserver {
+//class ContentObserver {
     constructor(callback) {
       this.observer = new MutationObserver(callback);
     }
@@ -19,5 +19,5 @@
     }
 }
 
-module.exports = ContentObserver;
-//window.ContentObserver = ContentObserver;
+//module.exports = ContentObserver;
+window.ContentObserver = ContentObserver;

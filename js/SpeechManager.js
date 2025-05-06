@@ -1,5 +1,5 @@
-//export default class SpeechManager {
-class SpeechManager {
+export default class SpeechManager {
+//class SpeechManager {
     constructor() {
         this.speechSynthesis = window.speechSynthesis;
         this.voices = [];
@@ -73,5 +73,5 @@ class SpeechManager {
     }
 }
 
-module.exports = SpeechManager;
-//window.SpeechManager = SpeechManager;
+//module.exports = SpeechManager;
+window.SpeechManager = SpeechManager;

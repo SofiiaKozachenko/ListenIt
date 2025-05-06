@@ -1,5 +1,5 @@
 import UiManager from "./js/UiManager.js";
-const SpeechManager = require('../js/SpeechManager');
+import SpeechManager from "./js/SpeechManager.js";
 import SettingManager from "./js/SettingManager.js";
 import ModeManager from "./js/ModeManager.js";
 
