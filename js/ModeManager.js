@@ -1,4 +1,5 @@
-export default class ModeManager {
+//export default class ModeManager {
+class ModeManager {
   constructor(speechManager) {
       this.speechManager = speechManager;
 
@@ -42,4 +43,5 @@ export default class ModeManager {
 
 }
 
-  window.ModeManager = ModeManager;
+module.exports = ModeManager;
+//window.ModeManager = ModeManager;
