@@ -39,8 +39,8 @@ const contentObserver = new ContentObserver(observeMutations);
 const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
 
 function isAd(element) {
-  return adSelectors.some(selector => element.closest(selector));
-}
+   return adSelectors.some(selector => element.closest(selector));
+ }
 
 function loadVoices() {
   voices = speechSynthesis.getVoices();
@@ -52,23 +52,36 @@ function loadVoices() {
 }
 
 function handleMouseOver(event) {
-  const target = event.target;
-  const text = textExtractor.getTextFromPageElement(target);
-  if (text && text.length <= 1500) {
-    speak(text);
-  }
-}
+   const target = event.target;
+ 
+   // Проверка на рекламу
+   if (settings.ignoreAds && isAd(target)) return;
+ 
+   const text = textExtractor.getTextFromPageElement(target);
+   if (text && text.length <= 1500) {
+     speak(text);
+   }
+ }
 
 function handleTabFocus(event) {
-  const target = event.target;
-  const text = textExtractor.getTextFromPageElement(target);
-  if (text) {
-    speak(text);
-  }
-}
+   const target = event.target;
+ 
+   if (settings.ignoreAds && isAd(target)) return;
+ 
+   const text = textExtractor.getTextFromPageElement(target);
+   if (text) {
+     speak(text);
+   }
+ }
 
 function handleTextSelection() {
-  const selectedText = textExtractor.getSelectedText();
+
+  const selection = window.getSelection();
+  const selectedText = selection.toString().trim();
+  const anchorNode = selection.anchorNode?.parentElement;
+ 
+  if (settings.ignoreAds && isAd(anchorNode)) return;
+ 
   if (selectedText) {
     speak(selectedText);
   }
