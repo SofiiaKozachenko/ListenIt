@@ -4,29 +4,26 @@ import SettingManager from "./js/SettingManager.js";
 import ModeManager from "./js/ModeManager.js";
 
 function observeMutations(mutationsList, observer) {
-    for (const mutation of mutationsList) {
-      if (mutation.type === 'childList' || mutation.type === 'subtree') {
-        // Handle the mutation, such as removing ads or reading content
-        removeAds();
-        readPageContent();
-        break; // Stop after handling the first mutation
-      }
+  for (const mutation of mutationsList) {
+    if (mutation.type === 'childList' || mutation.type === 'subtree') {
+      removeAds();
+      readPageContent();
+      break; // Stop after handling the first mutation
     }
   }
+}
   
-  // Example function to remove ads
-  function removeAds() {
-    const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
-    adSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(ad => ad.remove());
-    });
-  }
+function removeAds() {
+  const adSelectors = [".ad", "[id*='ads']", "[class*='ads']", "iframe", "script"];
+  adSelectors.forEach(selector => {
+    document.querySelectorAll(selector).forEach(ad => ad.remove());
+  });
+}
   
-  // Example function to read page content
-  function readPageContent() {
-    const pageText = document.body.innerText.trim();
-    if (pageText) {
-      console.log("Reading page content:", pageText); // Replace with actual speechManager.speak() if needed
+function readPageContent() {
+  const pageText = document.body.innerText.trim();
+  if (pageText) {
+    console.log("Reading page content:", pageText); // Replace with actual speechManager.speak() if needed
     }
   }
   
@@ -148,12 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     saveSettingsButton?.addEventListener("click", () => {
-    // Зберігаємо активний режим
     const activeButton = document.querySelector('.button-style.active');
-    const mode = activeButton ? activeButton.id.replace('Mode', '') : 'hover'; // Якщо нічого не вибрано, зберігаємо 'hover'
-
+    const mode = activeButton ? activeButton.id.replace('Mode', '') : 'hover'; 
     const settings = {
-        mode: mode, // зберігаємо поточний режим
+        mode: mode, 
         ignoreAds: ignoreAdsCheckbox?.checked ?? false,
         selectedVoice: selectedVoice,
         speechRate: parseFloat(uiManager.speechRateInput?.value) || 1,
@@ -161,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     chrome.storage.sync.set({ settings }, () => {
-        // Оновлюємо інтерфейс після збереження
         document.querySelectorAll('.button-style').forEach(button => {
             if (button.id.replace('Mode', '') === settings.mode) {
                 button.classList.add('active');
@@ -170,19 +164,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Повторно зчитуємо налаштування
         loadSettings();
 
-        // Перезавантажуємо вкладку
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs && tabs.length > 0) {
-                chrome.tabs.reload(tabs[0].id);
-            }
+          if (tabs && tabs.length > 0) {
+            chrome.tabs.reload(tabs[0].id);
+          }
         });
+      });
     });
-});
-
-
 
     stopSpeechButton?.addEventListener("click", () => {
         speechManager.stopSpeech();

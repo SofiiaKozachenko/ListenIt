@@ -2,7 +2,6 @@ export default class SettingManager {
     constructor(uiManager, speechManager) {
         this.uiManager = uiManager;
         this.speechManager = speechManager;
-
         this.loadSettings();
     }
 
