@@ -4,6 +4,11 @@ let voices = [];
 let voicesLoaded = false;
 let userInteracted = false;
 
+const languageVoiceMap = {
+  "uk": ["Microsoft Pavel", "Microsoft Irina"],
+  "en": ["Microsoft David", "Microsoft Zira", "Google US English Female", "Google US English Male"]
+};
+
 class TextExtractor {
   getPageText() {
     return getUniversalPageText();
@@ -40,6 +45,7 @@ function loadVoices() {
   if (voices.length > 0) {
     voicesLoaded = true;
     console.log("Голоси завантажено:", voices.map(v => `${v.name} (${v.lang})`));
+    autoUpdateVoiceByPageLang();
   } else {
     setTimeout(loadVoices, 100);
   }
@@ -47,12 +53,9 @@ function loadVoices() {
 
 function initVoices() {
   loadVoices();
-  if (voicesLoaded) {
-    autoUpdateVoiceByPageLang();
-  } else {
+  if (!voicesLoaded) {
     speechSynthesis.addEventListener('voiceschanged', () => {
       loadVoices();
-      autoUpdateVoiceByPageLang();
     });
   }
 }
@@ -78,7 +81,6 @@ chrome.storage.sync.get("settings", (data) => {
   } else if (settings.mode === 'readPage') {
     window.addEventListener("load", () => {
       if (userInteracted) {
-        // Затримка для динамічного контенту
         setTimeout(() => observeAndReadPageContent(), 3000);
       }
     });
@@ -89,9 +91,43 @@ chrome.storage.sync.get("settings", (data) => {
   } else {
     document.addEventListener("focusin", handleTabFocus);
   }
-
-  loadVoices();
 });
+
+function getPageLanguageCode() {
+  const htmlLang = document.documentElement.lang || document.querySelector('html')?.getAttribute('lang') || "";
+  const langCode = htmlLang.toLowerCase().split('-')[0];
+  console.log("Мова сторінки з <html lang>:", langCode);
+  return langCode;
+}
+
+function autoUpdateVoiceByPageLang() {
+  const langCode = getPageLanguageCode();
+
+  const possibleVoices = languageVoiceMap[langCode];
+  if (!possibleVoices) {
+    console.warn(`Голоси для мови '${langCode}' не знайдені.`);
+    return;
+  }
+
+  let bestVoice = null;
+  for (const voiceName of possibleVoices) {
+    const voice = voices.find(v => v.name.toLowerCase().includes(voiceName.toLowerCase()));
+    if (voice) {
+      bestVoice = voice.name;
+      break;
+    }
+  }
+
+  if (!bestVoice) {
+    console.warn(`Не знайдено підходящого голосу для мови ${langCode}`);
+    return;
+  }
+
+  settings.selectedVoice = bestVoice;
+  chrome.storage.sync.set({ settings }, () => {
+    console.log(`Голос для мови '${langCode}' встановлено: ${bestVoice}`);
+  });
+}
 
 function handleMouseOver(event) {
   if (!voicesLoaded) return;
@@ -127,7 +163,6 @@ function handleTextSelection() {
 function observeAndReadPageContent() {
   removeAds();
   readPageContent();
-  // Для динамічного оновлення контенту
   const observer = new MutationObserver(() => {
     removeAds();
     readPageContent();
@@ -145,14 +180,33 @@ function readPageContent() {
   }
 }
 
-function speak(text) {
+async function speak(text) {
   if (!text.trim()) {
     console.error("Текст для озвучення порожній.");
     return;
   }
+
+  const langCode = getPageLanguageCode();
+
+  if (langCode === 'uk') {
+    chrome.runtime.sendMessage({ action: 'tts', text }, response => {
+      if (response?.audioUrl) {
+        const audio = new Audio(response.audioUrl);
+        audio.play().catch(err => console.error("Помилка відтворення аудіо:", err));
+      } else {
+        console.error("Помилка ElevenLabs TTS:", response?.error);
+        speakWithWebSpeech(text);
+      }
+    });
+  } else {
+    speakWithWebSpeech(text);
+  }
+}
+
+function speakWithWebSpeech(text) {
   if (!voicesLoaded) {
     console.warn("Голоси ще не завантажилися. Чекаємо...");
-    setTimeout(() => speak(text), 500);
+    setTimeout(() => speakWithWebSpeech(text), 500);
     return;
   }
   if (currentUtterance) {
@@ -161,17 +215,12 @@ function speak(text) {
   }
   currentUtterance = new SpeechSynthesisUtterance(text);
 
-  const pageLang = getPageLanguage();
-  currentUtterance.lang = pageLang;
-
-  autoUpdateVoiceByPageLang();
-
   const selectedVoice = voices.find(v =>
     v.name.toLowerCase() === (settings.selectedVoice || "").toLowerCase()
   );
 
   if (!selectedVoice) {
-    console.warn("Вибраний голос не знайдено, використовується стандартний.");
+    console.warn("Обраний голос не знайдено, використовується стандартний.");
   }
   currentUtterance.voice = selectedVoice || voices[0] || null;
 
@@ -180,6 +229,7 @@ function speak(text) {
     return;
   }
 
+  currentUtterance.lang = getPageLanguageCode() === 'uk' ? 'uk-UA' : 'en-US';
   currentUtterance.rate = settings.speechRate || 1;
   currentUtterance.pitch = settings.speechPitch || 1;
 
@@ -203,110 +253,19 @@ function removeAds() {
   });
 }
 
-const languageVoiceMap = {
-  "uk": ["Microsoft Pavel"],
-  "en": ["Microsoft David", "Microsoft Zira", "Google US English"]
-};
-
-function autoUpdateVoiceByPageLang() {
-  const pageLang = getPageLanguage();
-  const langCode = pageLang.slice(0, 2).toLowerCase();
-  const possibleVoices = languageVoiceMap[langCode];
-  if (!possibleVoices) return;
-
-  let bestVoice = null;
-  for (const voiceName of possibleVoices) {
-    const voice = voices.find(v => v.name.toLowerCase().includes(voiceName.toLowerCase()));
-    if (voice) {
-      bestVoice = voice.name;
-      break;
-    }
+chrome.runtime.sendMessage({ action: 'tts', text }, response => {
+  if (response?.audioBase64) {
+    const audioSrc = `data:audio/mpeg;base64,${response.audioBase64}`;
+    const audio = new Audio(audioSrc);
+    audio.play().catch(err => console.error("Помилка відтворення аудіо:", err));
+  } else if (response?.error) {
+    console.error("Помилка ElevenLabs TTS:", response.error);
+    speakWithWebSpeech(text);
+  } else {
+    console.error("Невідома помилка ElevenLabs TTS");
+    speakWithWebSpeech(text);
   }
-
-  if (!bestVoice) {
-    console.warn(`Не знайдено підходящого голосу для мови ${langCode}`);
-    return;
-  }
-
-  if (langCode === "uk") {
-    settings.selectedVoice = bestVoice;
-    chrome.storage.sync.set({ settings }, () => {
-      console.log(`Голос для української встановлено: ${bestVoice}`);
-    });
-  } else if (langCode === "en") {
-    chrome.storage.sync.get("settings", (data) => {
-      const currentSettings = data.settings || {};
-      if (currentSettings.selectedVoice !== bestVoice) {
-        currentSettings.selectedVoice = bestVoice;
-        chrome.storage.sync.set({ settings: currentSettings }, () => {
-          console.log(`Голос для англійської оновлено: ${bestVoice}`);
-        });
-      }
-    });
-  }
-}
-
-function getUniversalPageText() {
-  const selectors = ['main', 'article', '.content', '.main-content', '.post-content', '.article-content'];
-  for (const selector of selectors) {
-    const el = document.querySelector(selector);
-    if (el) {
-      const text = el.innerText.trim();
-      if (text.length > 100) {
-        return cleanText(text);
-      }
-    }
-  }
-  const candidates = Array.from(document.querySelectorAll('div, section, article'))
-    .map(el => ({el, length: el.innerText.trim().length}))
-    .filter(x => x.length > 100);
-  if (candidates.length > 0) {
-    candidates.sort((a, b) => b.length - a.length);
-    return cleanText(candidates[0].el.innerText.trim());
-  }
-  const bodyText = document.body.innerText.trim();
-  if (bodyText.length > 100) {
-    return cleanText(bodyText);
-  }
-  return "";
-}
-
-function cleanText(text) {
-  return text
-    .replace(/https?:\/\/[^\s]+/gi, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
-
-function getPageLanguage() {
-  const htmlLang = document.documentElement.lang || document.querySelector('html')?.getAttribute('lang');
-  if (htmlLang) {
-    return htmlLang.startsWith('uk') ? 'uk-UA' : htmlLang.startsWith('en') ? 'en-US' : htmlLang;
-  }
-  const mainContent = getUniversalPageText();
-  const cleanTextContent = mainContent.replace(/https?:\/\/[^\s]+/gi, '');
-  return detectLanguage(cleanTextContent) || "uk-UA";
-}
-
-function detectLanguage(text) {
-  if (!text || text.length < 10) return "uk-UA";
-
-  const ukrainianPattern = /[їієґщфхцчшжюяєґ]/gi;
-  const ukrainianWords = /\b(та|і|в|на|з|для|що|який|як|де|коли|чому|тому|але|або|якщо|тоді)\b/gi;
-  const englishPattern = /\b(the|and|or|in|on|at|to|for|with|by|from|this|that|what|how|when|where|why)\b/gi;
-
-  const ukrainianChars = text.match(ukrainianPattern) || [];
-  const ukrainianWordsMatch = text.match(ukrainianWords) || [];
-  const englishWords = text.match(englishPattern) || [];
-
-  const ukrainianScore = ukrainianChars.length + (ukrainianWordsMatch.length * 2);
-  const englishScore = englishWords.length;
-
-  if (ukrainianChars.length > 0 && ukrainianScore >= englishScore) {
-    return "uk-UA";
-  }
-  return englishScore > ukrainianScore ? "en-US" : "uk-UA";
-}
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Отримано повідомлення:", message);
