@@ -378,3 +378,44 @@ input[type="range"]:focus {
 .dropdown-content.show {
     display: block;
 }
+.root {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(241 246 252);
+  outline-offset: -3px;
+  border-radius: 22px;
+  outline: rgb(31 45 93) solid 3px;
+  width: 639px;
+}
+
+.flex_col {
+  display: flex;
+  flex-direction: column;
+  row-gap: 23px;
+  margin: 51px auto;
+  width: 82.47%;
+}
+
+.desc {
+  display: flex;
+  justify-content: center;
+  font: 30px/1.2 Inter, Helvetica, Arial, serif;
+  color: rgb(21 21 22);
+  text-align: center;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(31 45 93);
+  box-shadow: inset 4px 4px 4px 0 rgb(79 92 139 / 100%);
+}
+
+.info {
+  display: flex;
+  justify-content: center;
+  margin: 32px 40px 31px;
+  font: 30px/1.2 Inter, Helvetica, Arial, serif;
+  color: rgb(255 255 255);
+  text-align: center;
+}
