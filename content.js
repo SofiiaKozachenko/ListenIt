@@ -123,6 +123,10 @@ function autoUpdateVoiceByPageLang() {
     return;
   }
 
+  if (langCode === 'en') {
+    showLanguageChangeNotification();
+  }
+
   settings.selectedVoice = bestVoice;
   chrome.storage.sync.set({ settings }, () => {
     console.log(`Голос для мови '${langCode}' встановлено: ${bestVoice}`);
@@ -300,3 +304,83 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   sendResponse({success: true});
 });
+
+
+function showLanguageChangeNotification() {
+  if (document.getElementById('langChangeNotification')) return;
+
+  const container = document.createElement('div');
+  container.id = 'langChangeNotification';
+
+  // Стилі контейнера: повне фіксоване накриття, щоб по центру екрану
+  container.style.position = 'fixed';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.width = '100vw';
+  container.style.height = '100vh';
+  container.style.backgroundColor = 'rgba(0, 0, 0, 0.4)'; // напівпрозорий фон
+  container.style.display = 'flex';
+  container.style.justifyContent = 'center';
+  container.style.alignItems = 'center';
+  container.style.zIndex = 9999;
+  container.style.userSelect = 'none';
+
+  // Внутрішній блок повідомлення
+  const messageBox = document.createElement('div');
+  messageBox.style.backgroundColor = 'rgb(241,246,252)';
+  messageBox.style.outline = '3px solid rgb(31 45 93)';
+  messageBox.style.borderRadius = '22px';
+  messageBox.style.width = '640px';
+  messageBox.style.padding = '40px';
+  messageBox.style.boxSizing = 'border-box';
+  messageBox.style.textAlign = 'center';
+  messageBox.style.fontFamily = "'Inter', Helvetica, Arial, sans-serif";
+  messageBox.style.color = 'rgb(21, 21, 22)';
+  messageBox.style.display = 'flex';
+  messageBox.style.flexDirection = 'column';
+  messageBox.style.rowGap = '23px';
+
+  // Текст повідомлення
+  const desc = document.createElement('p');
+  desc.textContent = 'Голос озвучення автоматично змінено на англомовний відповідно до мови сторінки.';
+  desc.style.fontSize = '30px';
+  desc.style.margin = '0';
+
+  // Кнопка ОК
+  const okBtn = document.createElement('div');
+  okBtn.textContent = 'ОК';
+  okBtn.style.backgroundColor = 'rgb(31 45 93)';
+  okBtn.style.color = 'white';
+  okBtn.style.fontSize = '30px';
+  okBtn.style.padding = '32px 0';
+  okBtn.style.borderRadius = '10px';
+  okBtn.style.cursor = 'pointer';
+  okBtn.style.userSelect = 'none';
+
+  okBtn.addEventListener('click', () => {
+    container.remove();
+  });
+
+  okBtn.focus();
+
+  messageBox.appendChild(desc);
+  messageBox.appendChild(okBtn);
+  container.appendChild(messageBox);
+  document.body.appendChild(container);
+  
+  function speakSequence(texts) {
+    if (!texts.length) return;
+  
+    const utterance = new SpeechSynthesisUtterance(texts[0]);
+    utterance.lang = 'uk-UA';
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.onend = () => {
+      speakSequence(texts.slice(1));
+    };
+    speechSynthesis.speak(utterance);
+  }
+  
+  speakSequence([desc.textContent, 'Кнопка ' + okBtn.textContent]);
+  
+}
