@@ -153,6 +153,12 @@ function handleTabFocus(event) {
   }
 }
 
+function getUniversalPageText() {
+  const bodyText = document.body?.innerText || "";
+  return bodyText.trim();
+}
+
+
 function handleTextSelection() {
   if (!voicesLoaded) return;
   const selection = window.getSelection();
